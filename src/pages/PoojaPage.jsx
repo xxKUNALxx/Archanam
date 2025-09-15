@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Leaf, Award, Handshake, Globe } from 'lucide-react';
 
-const poojaBannerUrl = 'https://images.unsplash.com/photo-1545558014-8692077e9b5c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80';
+const poojaBannerUrl = 'https://www.mahakaalprasad.com/cdn/shop/collections/pooja-path-10_1200x1200.webp?v=1716275840';
 const poojaService1 = 'https://images.unsplash.com/photo-1598379435436-1e0c2b2a2b0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80';
 const poojaService2 = 'https://images.unsplash.com/photo-1557020815-51e9e09d0a6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80';
 const poojaService3 = 'https://images.unsplash.com/photo-1582035905152-4a0b2b2a2b2c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80';
@@ -19,14 +19,14 @@ const PoojaPage = () => {
     }, []);
 
     return (
-        <div ref={pageRef} className="bg-white text-gray-800 font-sans">
+        <div ref={pageRef} className="bg-white text-[#424242] font-sans pt-16">
             {/* Top Banner */}
             <header className="relative w-full h-96 flex items-center justify-center text-center text-white overflow-hidden bg-cover bg-center" style={{ backgroundImage: `url(${poojaBannerUrl})` }}>
-                <div className="absolute inset-0 bg-black bg-opacity-60"></div>
+                <div className="absolute inset-0 bg-[#2E7D32]/80"></div>
                 <div className="relative z-10 p-6">
                     <h1 className="text-4xl md:text-6xl font-extrabold drop-shadow-lg leading-tight font-serif">Pooja Services</h1>
                     <h2 className="text-xl md:text-3xl font-semibold mt-2 drop-shadow">Bringing Divinity to Your Doorstep</h2>
-                    <a href="#pooja-services-list" className="mt-8 inline-block bg-white text-orange-600 px-8 py-4 rounded-full text-lg font-semibold hover:bg-yellow-100 transform hover:scale-105 transition-all duration-300 shadow-lg">
+                    <a href="#pooja-services-list" className="mt-8 inline-block bg-[#FFB300] text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-[#FFC107] transform hover:scale-105 transition-all duration-300 shadow-lg">
                         View Our Services
                     </a>
                 </div>
@@ -35,8 +35,8 @@ const PoojaPage = () => {
             {/* Introduction to Pooja Services */}
             <section className="py-16 md:py-20 bg-gray-50">
                 <div className="container mx-auto px-4 text-center">
-                    <h3 className="text-3xl font-bold text-orange-800 font-serif mb-6">Our Commitment to Sacred Rituals</h3>
-                    <p className="max-w-3xl mx-auto text-lg leading-relaxed text-gray-700">
+                    <h3 className="text-3xl font-bold text-[#1B5E20] font-serif mb-6">Our Commitment to Sacred Rituals</h3>
+                    <p className="max-w-3xl mx-auto text-lg leading-relaxed text-[#424242]">
                         At Archanam, we provide a wide range of traditional Pooja services performed by experienced and knowledgeable Pandits. Our goal is to help you connect with your spiritual side and bring peace, prosperity, and blessings to your life. All rituals are performed with utmost devotion and according to authentic Vedic traditions.
                     </p>
                 </div>
@@ -46,7 +46,7 @@ const PoojaPage = () => {
             <section id="pooja-services-list" className="py-16 md:py-20 bg-white">
                 <div className="container mx-auto px-4">
                     <div className="text-center mb-12">
-                        <h3 className="text-3xl font-bold text-orange-800 font-serif mb-4">Explore Our Pooja Offerings</h3>
+                        <h3 className="text-3xl font-bold text-[#1B5E20] font-serif mb-4">Explore Our Pooja Offerings</h3>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {[
@@ -57,12 +57,12 @@ const PoojaPage = () => {
                             { title: "Navagraha Shanti", image: poojaService2, desc: "Pacifying the nine planetary deities to mitigate malefic effects." },
                             { title: "Vivah Sanskar", image: poojaService3, desc: "Traditional wedding rituals for a blissful married life." }
                         ].map((service, index) => (
-                            <div key={index} className="pooja-card group p-6 rounded-2xl shadow-xl bg-gradient-to-br from-orange-50 to-pink-50 border border-orange-200 transform transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+                            <div key={index} className="pooja-card group p-6 rounded-2xl shadow-xl bg-white border border-gray-200 transform transition-all duration-300 hover:scale-105 hover:shadow-2xl">
                                 <div className="w-full h-56 mx-auto mb-4 overflow-hidden rounded-lg shadow-md transition-all duration-300 group-hover:scale-105 group-hover:saturate-150">
                                     <img src={service.image} alt={service.title} className="w-full h-full object-cover" />
                                 </div>
-                                <h3 className="text-2xl font-bold text-orange-800 mb-2 font-serif">{service.title}</h3>
-                                <p className="text-gray-700 italic">{service.desc}</p>
+                                <h3 className="text-2xl font-bold text-[#1B5E20] mb-2 font-serif">{service.title}</h3>
+                                <p className="text-[#424242] italic">{service.desc}</p>
                             </div>
                         ))}
                     </div>

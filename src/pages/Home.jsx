@@ -240,7 +240,7 @@ const Home = () => {
         return (
             <>
                 {/* Hero Section - Home Page with Om signs and Banana Trees */}
-                <section ref={heroRef} id="home" className="relative pt-20 min-h-screen flex items-center justify-center overflow-hidden bg-cover bg-fixed bg-center" style={{ backgroundImage: `url(${homeBgUrl})` }}>
+                <section ref={heroRef} id="home" className="relative pt-16 sm:pt-20 min-h-screen flex items-center justify-center overflow-hidden bg-cover bg-center sm:bg-fixed" style={{ backgroundImage: `url(${homeBgUrl})` }}>
                     <div className="absolute inset-0 bg-gradient-to-b from-[#000000]/60 to-[#000000]/40 z-0"></div>
                     <div className="absolute inset-0 z-10 pointer-events-none">
                         <div className="w-full h-full relative">
@@ -261,18 +261,17 @@ const Home = () => {
                         </div>
                     </div>
                     <div className="container mx-auto px-4 relative z-20 text-center text-white">
-                        <h1 className="hero-title text-5xl lg:text-7xl font-extrabold mb-6 drop-shadow-lg leading-tight font-serif">
+                        <h1 className="hero-title text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold mb-4 sm:mb-6 drop-shadow-lg leading-tight font-serif">
                             <span className="hero-title-main divine-text-shadow">अर्चनम्</span>
-                            <div className="text-3xl lg:text-4xl text-[#FFB300] mt-4 font-semibold">श्रद्धा से सेवा तक - हर पूजा आपके घर तक
-</div>
+                            <div className="text-lg sm:text-xl md:text-2xl lg:text-4xl text-[#FFB300] mt-2 sm:mt-4 font-semibold">श्रद्धा से सेवा तक - हर पूजा आपके घर तक</div>
                         </h1>
-                        <p className="hero-subtitle text-xl lg:text-2xl mb-4 max-w-3xl mx-auto drop-shadow-md font-devanagari">
+                        <p className="hero-subtitle text-base sm:text-lg md:text-xl lg:text-2xl mb-4 max-w-3xl mx-auto drop-shadow-md font-devanagari px-4">
                             ॐ सर्वे भवन्तु सुखिनः। सर्वे सन्तु निरामयाः।
                         </p>
-                        <p className="hero-subtitle text-xl lg:text-2xl mb-10 max-w-3xl mx-auto drop-shadow-md font-devanagari">
+                        <p className="hero-subtitle text-base sm:text-lg md:text-xl lg:text-2xl mb-6 sm:mb-10 max-w-3xl mx-auto drop-shadow-md font-devanagari px-4">
                             अपने घर पर पारंपरिक पूजा अनुष्ठानों के साथ दिव्यता का अनुभव करें। हमारी सेवाओं के साथ अपने जीवन में आध्यात्मिक शांति और समृद्धि लाएं।
                         </p>
-                        <button onClick={goToBooking} className="hero-button bg-gradient-to-r from-[#FFB300] to-[#FFC107] text-white px-10 py-5 rounded-full text-xl font-bold hover:from-[#FFC107] hover:to-[#FFD54F] transform hover:scale-105 transition-all duration-300 shadow-xl tracking-wide font-devanagari">
+                        <button onClick={goToBooking} className="hero-button bg-gradient-to-r from-[#FFB300] to-[#FFC107] text-white px-6 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 rounded-full text-lg sm:text-xl font-bold hover:from-[#FFC107] hover:to-[#FFD54F] transform hover:scale-105 transition-all duration-300 shadow-xl tracking-wide font-devanagari">
                             अभी सेवा बुक करें
                         </button>
                     </div>
@@ -282,14 +281,14 @@ const Home = () => {
                 <section ref={servicesRef} id="services" className="py-20 bg-gradient-to-br from-[#F5F5F5] to-[#EEEEEE]">
                     <div className="container mx-auto px-4">
                         <div className="text-center mb-16">
-                            <h2 className="section-title text-4xl font-bold text-[#1B5E20] mb-4 font-serif">हमारी सेवाएं</h2>
-                            <p className="section-title text-xl text-gray-600 font-devanagari">आपकी आध्यात्मिक आवश्यकताओं के लिए विशेष सेवाएं</p>
+                            <h2 className="section-title text-2xl sm:text-3xl md:text-4xl font-bold text-[#1B5E20] mb-4 font-serif">हमारी सेवाएं</h2>
+                            <p className="section-title text-base sm:text-lg md:text-xl text-gray-600 font-devanagari">आपकी आध्यात्मिक आवश्यकताओं के लिए विशेष सेवाएं</p>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto">
                             {/* Pooja Services Card */}
                             <div onClick={(e) => handleNavigation(e, 'pooja')} className="service-card cursor-pointer group p-8 rounded-2xl shadow-lg bg-white border border-gray-200 transform transition-all duration-500 hover:scale-105 hover:shadow-xl hover:border-[#FFB300]">
                                 <div className="flex flex-col items-center">
-                                    <div className="w-32 h-32 mb-4 rounded-full overflow-hidden border-4 border-[#FFB300] transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
+                                    <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 mb-4 rounded-full overflow-hidden border-4 border-[#FFB300] transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
                                         <img src={Pooja} alt="Pooja Services" className="w-full h-full object-cover" />
                                     </div>
                                     <h3 className="text-2xl font-bold text-[#1B5E20] mb-2 font-serif text-center">पूजा सेवाएं</h3>
@@ -300,7 +299,7 @@ const Home = () => {
                             {/* Nirmalya Seva Card */}
                             <div onClick={(e) => handleNavigation(e, 'nirmalya')} className="service-card cursor-pointer group p-8 rounded-2xl shadow-lg bg-white border border-gray-200 transform transition-all duration-500 hover:scale-105 hover:shadow-xl hover:border-[#FFB300]">
                                 <div className="flex flex-col items-center">
-                                    <div className="w-32 h-32 mb-4 rounded-full overflow-hidden border-4 border-[#FFB300] transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6">
+                                    <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 mb-4 rounded-full overflow-hidden border-4 border-[#FFB300] transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6">
                                         <img src={Yagya} alt="Nirmalya Seva" className="w-full h-full object-cover" />
                                     </div>
                                     <h3 className="text-2xl font-bold text-[#1B5E20] mb-2 font-serif text-center">निर्माल्य सेवा</h3>
@@ -311,7 +310,7 @@ const Home = () => {
                             {/* AI Modules Card */}
                             <div onClick={(e) => handleNavigation(e, 'ai')} className="service-card cursor-pointer group p-8 rounded-2xl shadow-lg bg-white border border-gray-200 transform transition-all duration-500 hover:scale-105 hover:shadow-xl hover:border-[#FFB300]">
                                 <div className="flex flex-col items-center">
-                                    <div className="w-32 h-32 mb-4 rounded-full overflow-hidden border-4 border-[#FFB300] transition-transform duration-500 group-hover:scale-110">
+                                    <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 mb-4 rounded-full overflow-hidden border-4 border-[#FFB300] transition-transform duration-500 group-hover:scale-110">
                                         <img src={ai} alt="AI Modules" className="w-full h-full object-cover" />
                                     </div>
                                     <h3 className="text-2xl font-bold text-[#1B5E20] mb-2 font-serif text-center">AI मॉड्यूल</h3>
@@ -322,7 +321,7 @@ const Home = () => {
                             {/* Daily Flower Mala Service Card */}
                             <div onClick={(e) => handleNavigation(e, 'mala')} className="service-card cursor-pointer group p-8 rounded-2xl shadow-lg bg-white border border-gray-200 transform transition-all duration-500 hover:scale-105 hover:shadow-xl hover:border-[#FFB300]">
                                 <div className="flex flex-col items-center">
-                                    <div className="w-32 h-32 mb-4 rounded-full overflow-hidden border-4 border-[#FFB300] transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6">
+                                    <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 mb-4 rounded-full overflow-hidden border-4 border-[#FFB300] transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6">
                                         <img src={Mala} alt="Daily Flower Mala" className="w-full h-full object-cover" />
                                     </div>
                                     <h3 className="text-2xl font-bold text-[#1B5E20] mb-2 font-serif text-center">डेली फूल माला</h3>
@@ -333,7 +332,7 @@ const Home = () => {
                             {/* Daily Puja Materials Card */}
                             <div className="service-card cursor-pointer group p-8 rounded-2xl shadow-lg bg-white border border-gray-200 transform transition-all duration-500 hover:scale-105 hover:shadow-xl hover:border-[#FFB300]">
                                 <div className="flex flex-col items-center">
-                                    <div className="w-32 h-32 mb-4 rounded-full overflow-hidden border-4 border-[#FFB300] transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
+                                    <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 mb-4 rounded-full overflow-hidden border-4 border-[#FFB300] transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
                                         <img src={Samgri} alt="Daily Puja Materials" className="w-full h-full object-cover" />
                                     </div>
                                     <h3 className="text-2xl font-bold text-[#1B5E20] mb-2 font-serif text-center">नित्य पूजन सामग्री</h3>
@@ -344,7 +343,7 @@ const Home = () => {
                             {/* Astrology Kundali Card */}
                             <div onClick={(e) => handleNavigation(e, 'astrology')} className="service-card cursor-pointer group p-8 rounded-2xl shadow-lg bg-white border border-gray-200 transform transition-all duration-500 hover:scale-105 hover:shadow-xl hover:border-[#FFB300]">
                                 <div className="flex flex-col items-center">
-                                    <div className="w-32 h-32 mb-4 rounded-full overflow-hidden border-4 border-[#FFB300] transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6">
+                                    <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 mb-4 rounded-full overflow-hidden border-4 border-[#FFB300] transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6">
                                         <img src={kundali}  alt="Astrology Kundali" className="w-full h-full object-cover" />
                                     </div>
                                     <h3 className="text-2xl font-bold text-[#1B5E20] mb-2 font-serif text-center">ज्योतिष कुंडली</h3>
@@ -384,9 +383,9 @@ const Home = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-4">
-                                    <div className="h-64 rounded-xl overflow-hidden shadow-lg relative transform transition-transform duration-500 hover:scale-105">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                                <div className="space-y-4 sm:space-y-6">
+                                    <div className="h-48 sm:h-56 md:h-64 rounded-xl overflow-hidden shadow-lg relative transform transition-transform duration-500 hover:scale-105">
                                         <img
                                             src="https://i.pinimg.com/736x/d0/08/90/d008903c85b910a67047bdb2450ac013.jpg"
                                             alt="Hindu Temple"
@@ -394,7 +393,7 @@ const Home = () => {
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-[#1B5E20]/40 to-transparent"></div>
                                     </div>
-                                    <div className="h-48 rounded-xl overflow-hidden shadow-lg relative transform transition-transform duration-500 hover:scale-105">
+                                    <div className="h-40 sm:h-48 md:h-48 rounded-xl overflow-hidden shadow-lg relative transform transition-transform duration-500 hover:scale-105">
                                         <img
                                             src="https://i.pinimg.com/1200x/a6/97/96/a69796b376475a57668cb0ac789d38d8.jpg"
                                             alt="Lotus flower"
@@ -403,8 +402,8 @@ const Home = () => {
                                         <div className="absolute inset-0 bg-gradient-to-t from-[#FFB300]/40 to-transparent"></div>
                                     </div>
                                 </div>
-                                <div className="space-y-4 mt-8">
-                                    <div className="h-48 rounded-xl overflow-hidden shadow-lg relative transform transition-transform duration-500 hover:scale-105">
+                                <div className="space-y-4 sm:space-y-6 sm:mt-0 mt-8">
+                                    <div className="h-40 sm:h-48 md:h-48 rounded-xl overflow-hidden shadow-lg relative transform transition-transform duration-500 hover:scale-105">
                                         <img
                                             src="https://i.pinimg.com/736x/8b/a3/22/8ba322b239ed9a845c7c83abaef61827.jpg"
                                             alt="Prayer beads"
@@ -412,7 +411,7 @@ const Home = () => {
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-[#FFB300]/40 to-transparent"></div>
                                     </div>
-                                    <div className="h-64 rounded-xl overflow-hidden shadow-lg relative transform transition-transform duration-500 hover:scale-105">
+                                    <div className="h-48 sm:h-56 md:h-64 rounded-xl overflow-hidden shadow-lg relative transform transition-transform duration-500 hover:scale-105">
                                         <img
                                             src="https://i.pinimg.com/1200x/71/72/3a/71723a56db77c3e1e8d9c6168e50ed8c.jpg"
                                             alt="Hindu ceremony"
@@ -431,7 +430,7 @@ const Home = () => {
                     <div className="container mx-auto px-4 text-center">
                         <h2 className="section-title text-4xl font-bold text-[#1B5E20] mb-4 font-serif">दिव्य देवता</h2>
                         <p className="section-title text-xl text-[#424242] mb-12 font-devanagari">हमारे समारोहों में जिन देवताओं की हम पूजा करते हैं, उनके बारे में जानें</p>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 sm:gap-8">
                             {[
                                 { name: "भगवान सूर्य", image: surya, desc: "सूर्य देवता जीवन, ऊर्जा और सफलता के दाता हैं।", shloka: "आदित्यस्य नमस्कारान् सर्वे भवन्तु सुखिनः" },
                                 { name: "भगवान गणेश", image: ganeshaUrl, desc: "विघ्नहर्ता गणेश जी सभी बाधाओं को दूर करने वाले और नए कार्यों के आरंभकर्ता हैं।", shloka: "गजाननं भूतगणादिसेवितं कपित्थजम्बूफलसारभक्षितम्" },
@@ -440,7 +439,7 @@ const Home = () => {
                                 { name: "भगवान विष्णु", image: vishnu, desc: "विष्णु भगवान पालनकर्ता और धर्म के रक्षक हैं।", shloka: "शान्ताकारं भुजगशयनं पद्मनाभं सुरेशम्" }
                             ].map((deity, index) => (
                                 <div key={index} className="deity-card group p-6 rounded-2xl shadow-lg bg-white border border-gray-200 transform transition-all duration-500 hover:scale-105 hover:shadow-xl hover:border-[#FFB300]">
-                                    <div className="w-full h-56 mx-auto mb-4 overflow-hidden rounded-lg shadow-md transition-all duration-500 group-hover:scale-105 group-hover:saturate-150">
+                                    <div className="w-full h-48 sm:h-52 md:h-56 mx-auto mb-4 overflow-hidden rounded-lg shadow-md transition-all duration-500 group-hover:scale-105 group-hover:saturate-150">
                                         <img src={deity.image} alt={deity.name} className="w-full h-full object-cover bg-gradient-to-br from-gray-50 to-gray-100" />
                                     </div>
                                     <h3 className="text-2xl font-bold text-[#1B5E20] mb-2 font-serif">{deity.name}</h3>

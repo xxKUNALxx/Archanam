@@ -19,7 +19,7 @@ const Navbar = ({ onNavigate }) => {
             <div className="container mx-auto px-4">
                 <div className="flex items-center justify-between h-16">
                     <div className="flex items-center space-x-2 cursor-pointer" onClick={() => onNavigate?.({ preventDefault: () => {} }, 'home')}>
-                        <img src="/logo.png" alt="अर्चनम्" className=" mt-1  w-30 h-30" />
+                        <img src="/logo.png" alt="अर्चनम्" className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24" />
                     </div>
                     <div className="hidden md:flex space-x-8 items-center">
                         <a href="#home" onClick={(e)=>onNavigate?.(e,'home')} className="text-white hover:text-[#FFB300] transition-colors duration-300 relative group">

@@ -1,85 +1,26 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Phone, Mail, MapPin, Star, ChevronDown, ChevronUp, ArrowUp } from 'lucide-react';
+import Navbar from '../components/Navbar';
 import NirmalyaPage from './NirmalyaPage';
 import PoojaPage from './PoojaPage';
+import MalaPage from './MalaPage';
 import AIPage, { FloatingPujaChatbot } from './AI';
-import { useLanguage } from '../context/LanguageContext';
+import AstrologyPage from './AstrologyPage';
 
 // Main Home page image URLs
 const homeBgUrl = 'https://plus.unsplash.com/premium_photo-1697730326674-74b6c70509f4?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
 const Yagya = 'https://i.pinimg.com/1200x/63/5f/60/635f60ca8b55e2adf8fbc8a94809b150.jpg';
 const Pooja = 'https://i.pinimg.com/736x/ec/02/63/ec026397423fd6a9196d9a4f409e013d.jpg';
+const Mala = 'https://boondltd.com/wp-content/uploads/2024/01/mixed.png';
+const Samgri = 'https://rukminim2.flixcart.com/image/480/480/kgb5rbk0/pooja-thali-set/f/w/v/pooja-thali-nitya-passion-original-imafwkurvma9xd79.jpeg?q=90'
+const kundali = 'https://astrotalk.com/astrology-blog/wp-content/uploads/2021/11/online-kundali-janam-kundali.jpeg';
+const ai = 'https://img.freepik.com/free-photo/fantasy-scene-depicting-sun-god-s_23-2151339271.jpg';
 // Deities for the new section
-const hanumanUrl = 'https://static.vecteezy.com/system/resources/previews/029/631/156/large_2x/3d-illustration-of-the-indian-god-hanuman-with-a-floral-background-surrounding-it-free-photo.jpeg';
+const vishnu = 'https://i.pinimg.com/736x/23/28/ca/2328ca77dee0527b1fe17f58a8413d35.jpg'
+const devi ='https://i.pinimg.com/1200x/e0/89/56/e0895625475ecbe28bc99ea50f256aae.jpg'
+const surya='https://i.pinimg.com/736x/96/55/97/96559772e54bf3ed2282b9e1dbc26a03.jpg'
 const ganeshaUrl = 'https://static.vecteezy.com/system/resources/previews/069/750/796/non_2x/stone-carved-lord-ganesha-with-golden-aura-free-photo.jpg';
 const shivaUrl = 'https://i.pinimg.com/736x/9e/8c/f2/9e8cf28e13396a028717cb3b4884cf83.jpg';
-const krishnaUrl = 'https://i.pinimg.com/736x/f4/f0/6e/f4f06e2e49ea63a8d24e3fd51620995f.jpg';
-
-// Navbar Component with Dropdown
-const Navbar = ({ onNavigate }) => {
-    const {language,toggleLanguage} = useLanguage();
-    const navRef = useRef(null);
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    useEffect(() => {
-        if (typeof window !== 'undefined' && window.gsap) {
-            window.gsap.fromTo(navRef.current,
-                { y: -100, opacity: 0 },
-                { y: 0, opacity: 1, duration: 1, ease: "power3.out" }
-            );
-        }
-    }, []);
-    const toggleDropdown = () => {
-        setIsDropdownOpen(!isDropdownOpen);
-    };
-    return (
-        <nav ref={navRef} className="fixed top-0 w-full bg-[#1B5E20]/90 backdrop-blur-lg z-50 shadow-xl">
-            <div className="container mx-auto px-4">
-                <div className="flex items-center justify-between h-16">
-                    <div className="flex items-center space-x-2">
-                        <span className="text-[#FFB300] text-2xl animate-pulse">🕉️</span>
-                        <span className="text-white text-xl font-bold font-serif">अर्चनम्</span>
-                    </div>
-                    <div className="hidden md:flex space-x-8 items-center">
-                        <a href="#home" onClick={(e) => onNavigate(e, 'home')} className="text-white hover:text-[#FFB300] transition-colors duration-300 relative group">
-                            होम
-                            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFB300] transition-all duration-300 group-hover:w-full"></span>
-                        </a>
-                        <div className="relative">
-                            <button onClick={toggleDropdown} className="flex items-center space-x-1 text-white hover:text-[#FFB300] transition-colors focus:outline-none">
-                                <span>सेवाएं</span>
-                                {isDropdownOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                            </button>
-                            {isDropdownOpen && (
-                                <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-xl py-2 z-20 transform transition-all duration-300 origin-top">
-                                    <a href="#nirmalya" onClick={(e) => onNavigate(e, 'nirmalya')} className="block px-4 py-2 text-[#424242] hover:bg-[#F5F5F5] transition-colors">निर्माल्य सेवा</a>
-                                    <a href="#pooja" onClick={(e) => onNavigate(e, 'pooja')} className="block px-4 py-2 text-[#424242] hover:bg-[#F5F5F5] transition-colors">पूजा सेवाएं</a>
-                                    <a href="#ai" onClick={(e) => onNavigate(e, 'ai')} className="block px-4 py-2 text-[#424242] hover:bg-[#F5F5F5] transition-colors">AI मॉड्यूल</a>
-                                </div>
-                            )}
-                        </div>
-                        <a href="#about" onClick={(e) => onNavigate(e, 'home')} className="text-white hover:text-[#FFB300] transition-colors duration-300 relative group">
-                            हमारे बारे में
-                            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FFB300] transition-all duration-300 group-hover:w-full"></span>
-                        </a>
-                        <a href="#contact" onClick={(e) => onNavigate(e, 'home')} className="text-white hover:text-[#FFB300] transition-colors duration-300 relative group">
-                            संपर्क करें
-                            <span className="absolute bottom-0 left-0 w-0.5 bg-[#FFB300] transition-all duration-300 group-hover:w-full"></span>
-                        </a>
-                        <button 
-              onClick={toggleLanguage}
-              className="text-white hover:text-[#FFB300] transition-colors duration-300 px-3 py-1 rounded-lg border border-white/30"
-            >
-              {language === 'hi' ? 'English' : 'हिंदी'}
-            </button>
-                    </div>
-                    <div className="md:hidden">
-                        <button className="text-white">☰</button>
-                    </div>
-                </div>
-            </div>
-        </nav>
-    );
-};
 
 // Footer Component
 const Footer = () => {
@@ -152,6 +93,14 @@ const Home = () => {
         e.preventDefault();
         setCurrentPage(page);
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const goToBooking = (e) => {
+        if (e) e.preventDefault();
+        if (typeof window !== 'undefined') {
+            window.history.pushState({}, '', '/booking');
+            window.dispatchEvent(new PopStateEvent('popstate'));
+        }
     };
 
     useEffect(() => {
@@ -276,30 +225,42 @@ const Home = () => {
         if (currentPage === 'nirmalya') {
             return <NirmalyaPage />;
         }
+        if (currentPage === 'mala') {
+            return <MalaPage />;
+        }
         if (currentPage === 'pooja') {
             return <PoojaPage />;
         }
         if (currentPage === 'ai') {
             return <AIPage />;
         }
+        if (currentPage === 'astrology') {
+            return <AstrologyPage />;
+        }
         return (
             <>
-                {/* Hero Section - Home Page with particles */}
+                {/* Hero Section - Home Page with Om signs and Banana Trees */}
                 <section ref={heroRef} id="home" className="relative pt-20 min-h-screen flex items-center justify-center overflow-hidden bg-cover bg-fixed bg-center" style={{ backgroundImage: `url(${homeBgUrl})` }}>
-                    <div className="absolute inset-0 bg-gradient-to-b from-[#000000]/60 to-[#000000]/40"></div>
-                    {/* Particles Effect */}
-                    <div className="absolute inset-0 z-0">
-                        {[...Array(15)].map((_, i) => (
-                            <div key={i} className="absolute rounded-full bg-[#FFB300]/20" style={{
-                                top: `${Math.random() * 100}%`,
-                                left: `${Math.random() * 100}%`,
-                                width: `${Math.random() * 20 + 5}px`,
-                                height: `${Math.random() * 20 + 5}px`,
-                                animation: `float ${Math.random() * 10 + 10}s infinite linear`
-                            }}></div>
-                        ))}
+                    <div className="absolute inset-0 bg-gradient-to-b from-[#000000]/60 to-[#000000]/40 z-0"></div>
+                    <div className="absolute inset-0 z-10 pointer-events-none">
+                        <div className="w-full h-full relative">
+                            {/* Banana trees on both sides */}
+                            <img
+                                src="/banana.png"
+                                alt="Banana Tree Left"
+                                className="select-none opacity-80"
+                                style={{ position: 'absolute', left: '-120px', bottom: '-20px', height: '75vh', width: 'auto', transformOrigin: 'bottom center', animation: 'sway 5s ease-in-out infinite' }}
+                            />
+                            <img
+                                src="/banana.png"
+                                alt="Banana Tree Right"
+                                className="select-none opacity-80"
+                                style={{ position: 'absolute', right: '-120px', bottom: '-20px', height: '75vh', width: 'auto', transform: 'scaleX(-1)', transformOrigin: 'bottom center', animation: 'sway 5s ease-in-out infinite' }}
+                            />
+                            
+                        </div>
                     </div>
-                    <div className="container mx-auto px-4 relative z-10 text-center text-white">
+                    <div className="container mx-auto px-4 relative z-20 text-center text-white">
                         <h1 className="hero-title text-5xl lg:text-7xl font-extrabold mb-6 drop-shadow-lg leading-tight font-serif">
                             <span className="hero-title-main divine-text-shadow">अर्चनम्</span>
                             <div className="text-3xl lg:text-4xl text-[#FFB300] mt-4 font-semibold">श्रद्धा से सेवा तक - हर पूजा आपके घर तक
@@ -311,7 +272,7 @@ const Home = () => {
                         <p className="hero-subtitle text-xl lg:text-2xl mb-10 max-w-3xl mx-auto drop-shadow-md font-devanagari">
                             अपने घर पर पारंपरिक पूजा अनुष्ठानों के साथ दिव्यता का अनुभव करें। हमारी सेवाओं के साथ अपने जीवन में आध्यात्मिक शांति और समृद्धि लाएं।
                         </p>
-                        <button className="hero-button bg-gradient-to-r from-[#FFB300] to-[#FFC107] text-white px-10 py-5 rounded-full text-xl font-bold hover:from-[#FFC107] hover:to-[#FFD54F] transform hover:scale-105 transition-all duration-300 shadow-xl tracking-wide font-devanagari">
+                        <button onClick={goToBooking} className="hero-button bg-gradient-to-r from-[#FFB300] to-[#FFC107] text-white px-10 py-5 rounded-full text-xl font-bold hover:from-[#FFC107] hover:to-[#FFD54F] transform hover:scale-105 transition-all duration-300 shadow-xl tracking-wide font-devanagari">
                             अभी सेवा बुक करें
                         </button>
                     </div>
@@ -324,7 +285,7 @@ const Home = () => {
                             <h2 className="section-title text-4xl font-bold text-[#1B5E20] mb-4 font-serif">हमारी सेवाएं</h2>
                             <p className="section-title text-xl text-gray-600 font-devanagari">आपकी आध्यात्मिक आवश्यकताओं के लिए विशेष सेवाएं</p>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
                             {/* Pooja Services Card */}
                             <div onClick={(e) => handleNavigation(e, 'pooja')} className="service-card cursor-pointer group p-8 rounded-2xl shadow-lg bg-white border border-gray-200 transform transition-all duration-500 hover:scale-105 hover:shadow-xl hover:border-[#FFB300]">
                                 <div className="flex flex-col items-center">
@@ -351,13 +312,47 @@ const Home = () => {
                             <div onClick={(e) => handleNavigation(e, 'ai')} className="service-card cursor-pointer group p-8 rounded-2xl shadow-lg bg-white border border-gray-200 transform transition-all duration-500 hover:scale-105 hover:shadow-xl hover:border-[#FFB300]">
                                 <div className="flex flex-col items-center">
                                     <div className="w-32 h-32 mb-4 rounded-full overflow-hidden border-4 border-[#FFB300] transition-transform duration-500 group-hover:scale-110">
-                                        <img src={ganeshaUrl} alt="AI Modules" className="w-full h-full object-cover" />
+                                        <img src={ai} alt="AI Modules" className="w-full h-full object-cover" />
                                     </div>
                                     <h3 className="text-2xl font-bold text-[#1B5E20] mb-2 font-serif text-center">AI मॉड्यूल</h3>
                                     <p className="text-[#424242] text-center mb-4 font-devanagari">AI पूजा सुझाव, मंत्र सहायक, संकल्प, पंचांग</p>
                                     <div className="text-3xl mt-auto text-[#FFB300] transform transition-transform duration-500 group-hover:scale-125">🤖</div>
                                 </div>
                             </div>
+                            {/* Daily Flower Mala Service Card */}
+                            <div onClick={(e) => handleNavigation(e, 'mala')} className="service-card cursor-pointer group p-8 rounded-2xl shadow-lg bg-white border border-gray-200 transform transition-all duration-500 hover:scale-105 hover:shadow-xl hover:border-[#FFB300]">
+                                <div className="flex flex-col items-center">
+                                    <div className="w-32 h-32 mb-4 rounded-full overflow-hidden border-4 border-[#FFB300] transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6">
+                                        <img src={Mala} alt="Daily Flower Mala" className="w-full h-full object-cover" />
+                                    </div>
+                                    <h3 className="text-2xl font-bold text-[#1B5E20] mb-2 font-serif text-center">डेली फूल माला</h3>
+                                    <p className="text-[#424242] text-center mb-4 font-devanagari">रोज़ ताज़ी माला/फूल आपके घर तक — भक्ति के लिए।</p>
+                                    <div className="text-3xl mt-auto text-[#FFB300] transform transition-transform duration-500 group-hover:scale-125">🌸</div>
+                                </div>
+                            </div>
+                            {/* Daily Puja Materials Card */}
+                            <div className="service-card cursor-pointer group p-8 rounded-2xl shadow-lg bg-white border border-gray-200 transform transition-all duration-500 hover:scale-105 hover:shadow-xl hover:border-[#FFB300]">
+                                <div className="flex flex-col items-center">
+                                    <div className="w-32 h-32 mb-4 rounded-full overflow-hidden border-4 border-[#FFB300] transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
+                                        <img src={Samgri} alt="Daily Puja Materials" className="w-full h-full object-cover" />
+                                    </div>
+                                    <h3 className="text-2xl font-bold text-[#1B5E20] mb-2 font-serif text-center">नित्य पूजन सामग्री</h3>
+                                    <p className="text-[#424242] text-center mb-4 font-devanagari">दैनिक पूजा के लिए आवश्यक सभी सामग्री उपलब्ध।</p>
+                                    <div className="text-3xl mt-auto text-[#FFB300] transform transition-transform duration-500 group-hover:scale-125">🕯️</div>
+                                </div>
+                            </div>
+                            {/* Astrology Kundali Card */}
+                            <div onClick={(e) => handleNavigation(e, 'astrology')} className="service-card cursor-pointer group p-8 rounded-2xl shadow-lg bg-white border border-gray-200 transform transition-all duration-500 hover:scale-105 hover:shadow-xl hover:border-[#FFB300]">
+                                <div className="flex flex-col items-center">
+                                    <div className="w-32 h-32 mb-4 rounded-full overflow-hidden border-4 border-[#FFB300] transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6">
+                                        <img src={kundali}  alt="Astrology Kundali" className="w-full h-full object-cover" />
+                                    </div>
+                                    <h3 className="text-2xl font-bold text-[#1B5E20] mb-2 font-serif text-center">ज्योतिष कुंडली</h3>
+                                    <p className="text-[#424242] text-center mb-4 font-devanagari">व्यक्तिगत कुंडली विश्लेषण और ज्योतिष सलाह।</p>
+                                    <div className="text-3xl mt-auto text-[#FFB300] transform transition-transform duration-500 group-hover:scale-125">🔮</div>
+                                </div>
+                            </div>
+                            
                         </div>
                     </div>
                 </section>
@@ -369,10 +364,14 @@ const Home = () => {
                             <div className="about-content">
                                 <h2 className="section-title text-4xl font-bold text-[#1B5E20] mb-6 font-serif">हमारे बारे में</h2>
                                 <p className="section-title text-lg text-[#424242] mb-6 leading-relaxed font-devanagari">
-                                    अर्चनम् में, हमारा मिशन आपके जीवन में आध्यात्मिकता और दिव्यता लाना है। हमारे अनुभवी पंडित सभी पूजा समारोहों को पारंपरिक वैदिक अनुष्ठानों के अनुसार करते हैं।
+                                    "अर्चनम्" का संकल्प है आपके जीवन में शांति, सकारात्मकता और दिव्यता लाना।
+                                    हमारे अनुभवी पंडितजी पारंपरिक वैदिक विधियों से हर पूजा और अनुष्ठान को पूर्ण श्रद्धा और शुद्धता के साथ सम्पन्न करते हैं।
                                 </p>
-                                <p className="section-title text-lg text-[#424242] mb-6 leading-relaxed font-devanagari italic">
-                                    "वसुधैव कुटुम्बकम्" - पूरी दुनिया एक परिवार है
+                                <p className="section-title text-lg text-[#424242] mb-6 leading-relaxed font-devanagari">
+                                    आज 500+ संतुष्ट परिवारों और 20+ वर्षों के अनुभव के साथ हम विश्वास और आस्था का सेतु बने हुए हैं।
+                                </p>
+                                <p className="section-title text-lg text-[#FFB300] mb-6 leading-relaxed font-devanagari italic">
+                                    🌸 "आस्था से जुड़ें, संस्कृति को संजोएँ"
                                 </p>
                                 <div className="grid grid-cols-2 gap-6 mt-8">
                                     <div className="text-center p-6 bg-gradient-to-br from-[#FAFAFA] to-[#F5F5F5] rounded-xl shadow-lg border border-gray-200 transform transition-transform duration-300 hover:scale-105">
@@ -380,24 +379,24 @@ const Home = () => {
                                         <div className="text-[#424242] text-lg font-devanagari">प्रसन्न ग्राहक</div>
                                     </div>
                                     <div className="text-center p-6 bg-gradient-to-br from-[#FAFAFA] to-[#F5F5F5] rounded-xl shadow-lg border border-gray-200 transform transition-transform duration-300 hover:scale-105">
-                                        <div className="text-4xl text-[#FFB300] mb-2 font-bold font-serif">10+</div>
+                                        <div className="text-4xl text-[#FFB300] mb-2 font-bold font-serif">20+</div>
                                         <div className="text-[#424242] text-lg font-devanagari">वर्षों का अनुभव</div>
                                     </div>
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-4">
-                                    <div className="h-48 rounded-xl overflow-hidden shadow-lg relative transform transition-transform duration-500 hover:scale-105">
+                                    <div className="h-64 rounded-xl overflow-hidden shadow-lg relative transform transition-transform duration-500 hover:scale-105">
                                         <img
-                                            src="https://images.unsplash.com/photo-1545558014-8692077e9b5c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                                            src="https://i.pinimg.com/736x/d0/08/90/d008903c85b910a67047bdb2450ac013.jpg"
                                             alt="Hindu Temple"
                                             className="w-full h-full object-cover"
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-[#1B5E20]/40 to-transparent"></div>
                                     </div>
-                                    <div className="h-36 rounded-xl overflow-hidden shadow-lg relative transform transition-transform duration-500 hover:scale-105">
+                                    <div className="h-48 rounded-xl overflow-hidden shadow-lg relative transform transition-transform duration-500 hover:scale-105">
                                         <img
-                                            src="https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                                            src="https://i.pinimg.com/1200x/a6/97/96/a69796b376475a57668cb0ac789d38d8.jpg"
                                             alt="Lotus flower"
                                             className="w-full h-full object-cover"
                                         />
@@ -405,17 +404,17 @@ const Home = () => {
                                     </div>
                                 </div>
                                 <div className="space-y-4 mt-8">
-                                    <div className="h-36 rounded-xl overflow-hidden shadow-lg relative transform transition-transform duration-500 hover:scale-105">
+                                    <div className="h-48 rounded-xl overflow-hidden shadow-lg relative transform transition-transform duration-500 hover:scale-105">
                                         <img
-                                            src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                                            src="https://i.pinimg.com/736x/8b/a3/22/8ba322b239ed9a845c7c83abaef61827.jpg"
                                             alt="Prayer beads"
                                             className="w-full h-full object-cover"
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-[#FFB300]/40 to-transparent"></div>
                                     </div>
-                                    <div className="h-48 rounded-xl overflow-hidden shadow-lg relative transform transition-transform duration-500 hover:scale-105">
+                                    <div className="h-64 rounded-xl overflow-hidden shadow-lg relative transform transition-transform duration-500 hover:scale-105">
                                         <img
-                                            src="https://images.unsplash.com/photo-1609952667214-cc8f73d07db5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                                            src="https://i.pinimg.com/1200x/71/72/3a/71723a56db77c3e1e8d9c6168e50ed8c.jpg"
                                             alt="Hindu ceremony"
                                             className="w-full h-full object-cover"
                                         />
@@ -432,16 +431,17 @@ const Home = () => {
                     <div className="container mx-auto px-4 text-center">
                         <h2 className="section-title text-4xl font-bold text-[#1B5E20] mb-4 font-serif">दिव्य देवता</h2>
                         <p className="section-title text-xl text-[#424242] mb-12 font-devanagari">हमारे समारोहों में जिन देवताओं की हम पूजा करते हैं, उनके बारे में जानें</p>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
                             {[
-                                { name: "भगवान गणेश", image: ganeshaUrl, desc: "बाधाओं को दूर करने वाले और नए आरंभ के देवता।", shloka: "गजाननं भूतगणादिसेवितं..." },
-                                { name: "भगवान हनुमान", image: hanumanUrl, desc: "शक्ति, भक्ति और दृढ़ संकल्प के प्रतीक।", shloka: "बुद्धिहीन तनु जानिके..." },
-                                { name: "भगवान शिव", image: shivaUrl, desc: "बुराई का नाश करने वाले और सृष्टि के स्रोत।", shloka: "कर्पूरगौरं करुणावतारम्..." },
-                                { name: "भगवान कृष्ण", image: krishnaUrl, desc: "करुणा, प्रेम और आध्यात्मिक ज्ञान के देवता।", shloka: "श्लोक: चंदन चरचित नंदनं..." }
+                                { name: "भगवान सूर्य", image: surya, desc: "सूर्य देवता जीवन, ऊर्जा और सफलता के दाता हैं।", shloka: "आदित्यस्य नमस्कारान् सर्वे भवन्तु सुखिनः" },
+                                { name: "भगवान गणेश", image: ganeshaUrl, desc: "विघ्नहर्ता गणेश जी सभी बाधाओं को दूर करने वाले और नए कार्यों के आरंभकर्ता हैं।", shloka: "गजाननं भूतगणादिसेवितं कपित्थजम्बूफलसारभक्षितम्" },
+                                { name: "देवी शक्ति", image: devi, desc: "माँ दुर्गा शक्ति, साहस और रक्षा की देवी हैं।", shloka: "या देवी सर्वभूतेषु शक्तिरूपेण संस्थिता" },
+                                { name: "भगवान शिव", image: shivaUrl, desc: "महादेव शिव संहारकर्ता और कल्याणकारी हैं।", shloka: "कर्पूरगौरं करुणावतारं संसारसारं भुजगेन्द्रहारम्" },
+                                { name: "भगवान विष्णु", image: vishnu, desc: "विष्णु भगवान पालनकर्ता और धर्म के रक्षक हैं।", shloka: "शान्ताकारं भुजगशयनं पद्मनाभं सुरेशम्" }
                             ].map((deity, index) => (
                                 <div key={index} className="deity-card group p-6 rounded-2xl shadow-lg bg-white border border-gray-200 transform transition-all duration-500 hover:scale-105 hover:shadow-xl hover:border-[#FFB300]">
                                     <div className="w-full h-56 mx-auto mb-4 overflow-hidden rounded-lg shadow-md transition-all duration-500 group-hover:scale-105 group-hover:saturate-150">
-                                        <img src={deity.image} alt={deity.name} className="w-full h-full object-cover" />
+                                        <img src={deity.image} alt={deity.name} className="w-full h-full object-cover bg-gradient-to-br from-gray-50 to-gray-100" />
                                     </div>
                                     <h3 className="text-2xl font-bold text-[#1B5E20] mb-2 font-serif">{deity.name}</h3>
                                     <p className="text-[#424242] italic mb-2 font-devanagari">{deity.desc}</p>
@@ -459,11 +459,12 @@ const Home = () => {
                             <h2 className="section-title text-4xl font-bold text-[#1B5E20] mb-4 font-serif">ग्राहक प्रतिक्रिया</h2>
                             <p className="section-title text-xl text-[#424242] font-devanagari">हमारे संतुष्ट ग्राहकों से प्रतिक्रिया</p>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                             {[
-                                { name: "राम शर्मा", text: "एक बहुत ही पवित्र और सुंदर पूजा की। घर पर दिव्य उपस्थिति महसूस हुई।", rating: 5 },
-                                { name: "सीता देवी", text: "त्योहार की पूजा बहुत अच्छी रही। सभी अनुष्ठान बिल्कुल सही ढंग से किए गए।", rating: 5 },
-                                { name: "गोपाल जी", text: "समय पर पहुंचे और पूजा बहुत अच्छे से की। धन्यवाद!", rating: 5 }
+                                { name: "अनिल भूषण", text: "एक बहुत ही पवित्र और सुंदर पूजा की। घर पर दिव्य उपस्थिति महसूस हुई।", rating: 5 },
+                                { name: "एडवोकेट रीता सिंह", text: "त्योहार की पूजा बहुत अच्छी रही। सभी अनुष्ठान बिल्कुल सही ढंग से किए गए।", rating: 5 },
+                                { name: "राजीव शुक्ला", text: "समय पर पहुंचे और पूजा बहुत अच्छे से की। धन्यवाद!", rating: 5 },
+                                { name: "दिनेश पाठक", text: "निर्माल्य सेवा से घर में सकारात्मक ऊर्जा आई है। बहुत संतुष्ट हूं।", rating: 5 }
                             ].map((testimonial, index) => (
                                 <div key={index} className="testimonial-card bg-gradient-to-br from-[#FAFAFA] to-[#F5F5F5] p-6 rounded-2xl shadow-lg border border-gray-200 transform transition-all duration-500 hover:scale-105 hover:shadow-xl">
                                     <div className="flex mb-4">
@@ -504,7 +505,7 @@ const Home = () => {
                             </div>
                         </div>
                         <div className="text-center">
-                            <button className="bg-gradient-to-r from-[#FFB300] to-[#FFC107] text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-[#FFC107] hover:to-[#FFD54F] transform hover:scale-105 transition-all duration-300 shadow-lg font-devanagari">
+                            <button onClick={goToBooking} className="bg-gradient-to-r from-[#FFB300] to-[#FFC107] text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-[#FFC107] hover:to-[#FFD54F] transform hover:scale-105 transition-all duration-300 shadow-lg font-devanagari">
                                 अभी बुक करें
                             </button>
                         </div>
@@ -527,7 +528,7 @@ const Home = () => {
     
     return (
         <div className="min-h-screen bg-white font-sans">
-            <style jsx global>{`
+            <style>{`
                 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;700&family=Noto+Serif+Devanagari:wght@400;700&display=swap');
                 
                 @keyframes float {
@@ -535,6 +536,17 @@ const Home = () => {
                     10% { opacity: 1; }
                     90% { opacity: 1; }
                     100% { transform: translateY(-100vh) translateX(20px); opacity: 0; }
+                }
+                @keyframes floatOm {
+                    0% { transform: translateY(0px); opacity: 0.2; }
+                    25% { transform: translateY(-6px); opacity: 0.6; }
+                    50% { transform: translateY(0px); opacity: 0.9; }
+                    75% { transform: translateY(6px); opacity: 0.6; }
+                    100% { transform: translateY(0px); opacity: 0.2; }
+                }
+                @keyframes sway {
+                    0%, 100% { transform: rotate(0deg); }
+                    50% { transform: rotate(2.2deg); }
                 }
                 
                 .divine-text-shadow {
@@ -558,6 +570,12 @@ const Home = () => {
             {renderPage()}
             <Footer />
             <FloatingPujaChatbot />
+            <button 
+                onClick={goToBooking}
+                className="fixed bottom-8 right-6 bg-[#1B5E20] text-white px-5 py-3 rounded-full shadow-xl z-40 transform transition-all duration-300 hover:bg-[#2E7D32] hover:scale-105"
+            >
+                📅 Book Puja
+            </button>
         </div>
     );
 };

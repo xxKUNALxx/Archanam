@@ -192,19 +192,19 @@ const NirmalyaPage = () => {
                                 <tr className="bg-gradient-to-r from-[#1B5E20] to-[#2E7D32] text-white">
                                     <th className="p-4 text-lg font-semibold border-b-2 border-gray-300 font-devanagari">पैकेज</th>
                                     <th className="p-4 text-lg font-semibold border-b-2 border-gray-300 font-devanagari">विवरण</th>
-                                    <th className="p-4 text-lg font-semibold border-b-2 border-gray-300 font-devanagari">कीमत</th>
+                                    <th className="p-4 text-lg font-semibold border-b-2 border-gray-300 font-devanagari">सेवा शुल्क</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr className="package-row hover:bg-[#F5F5F5] transition-colors border-b border-gray-200">
-                                    <td className="p-4 text-lg font-medium font-devanagari">एक बार सेवा</td>
-                                    <td className="p-4 text-lg font-devanagari">निर्माल्य संग्रह और विसर्जन (स्थानीय क्षेत्र)</td>
-                                    <td className="p-4 text-lg font-bold text-[#1B5E20]">₹499</td>
+                                    <td className="p-4 text-lg font-medium font-devanagari">मासिक सेवा</td>
+                                    <td className="p-4 text-lg font-devanagari">महीना ₹251 - अधिकतम 1.5 किलो तक</td>
+                                    <td className="p-4 text-lg font-bold text-[#1B5E20]">₹251/महीना</td>
                                 </tr>
                                 <tr className="package-row hover:bg-[#F5F5F5] transition-colors">
-                                    <td className="p-4 text-lg font-medium font-devanagari">मासिक पैकेज</td>
-                                    <td className="p-4 text-lg font-devanagari">प्रति माह 4 सेवाएं</td>
-                                    <td className="p-4 text-lg font-bold text-[#1B5E20]">₹1499</td>
+                                    <td className="p-4 text-lg font-medium font-devanagari">4 महीने का पैकेज</td>
+                                    <td className="p-4 text-lg font-devanagari">4 महीने की सेवा (बचत ₹253)</td>
+                                    <td className="p-4 text-lg font-bold text-[#1B5E20]">₹751</td>
                                 </tr>
                             </tbody>
                         </table>

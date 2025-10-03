@@ -1,7 +1,7 @@
 // OTP service with email integration
 // Uses EmailJS service for real delivery
 
-import { sendOtpEmail } from './email.js';
+import { sendOtpEmail } from './emailOtp.js';
 
 const otpStore = new Map();
 
@@ -52,13 +52,15 @@ export async function sendOtp(email, language = 'en') {
 			provider: emailResult.provider
 		});
 		
-		return { 
-			success: true, 
-			expiresAt,
-			message: 'OTP sent successfully via email',
-			messageId: emailResult.messageId,
-			provider: emailResult.provider
-		};
+        return { 
+            success: true, 
+            expiresAt,
+            message: 'OTP sent successfully via email',
+            messageId: emailResult.messageId,
+            provider: emailResult.provider,
+            // Expose OTP only in development for troubleshooting deliverability (Vite/ESM safe)
+            debugCode: ((typeof import.meta !== 'undefined') && import.meta.env && import.meta.env.DEV) ? code : undefined
+        };
 	} catch (error) {
 		console.error('OTP sending failed:', error);
 		throw new Error(`Failed to send OTP: ${error.message}`);

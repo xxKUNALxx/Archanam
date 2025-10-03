@@ -7,7 +7,9 @@ import emailjs from '@emailjs/browser';
 const EMAILJS_CONFIG = {
     // Get these from https://www.emailjs.com/
     serviceId: 'service_y8omb6d', // Replace with your actual EmailJS service ID
-    templateId: 'template_n6h5s5t', // Replace with your EmailJS template ID
+    templateId: 'template_n6h5s5t', // legacy default
+    otpTemplateId: 'template_n6h5s5t', // OTP template ID
+    bookingTemplateId: 'template_snx5d52', // Admin booking template ID
     publicKey: '2kX9-9LSRIJM5TiOd', // Replace with your EmailJS public key
     fromName: 'अर्चनम्',
     fromEmail: 'danteonhunt@gmail.com'
@@ -207,14 +209,17 @@ export async function sendOtpEmail(email, otp, language = 'en') {
             language: language
         };
         
-        console.log(`📧 Sending OTP email to ${email} via EmailJS`);
-        console.log(`📧 Service ID: ${EMAILJS_CONFIG.serviceId}`);
-        console.log(`📧 Template ID: ${EMAILJS_CONFIG.templateId}`);
-        console.log(`📧 Template Params:`, templateParams);
+        const otpTemplateToUse = EMAILJS_CONFIG.otpTemplateId || EMAILJS_CONFIG.templateId;
+        console.log(`📧 Sending OTP email via EmailJS`);
+        console.log(`   → To: ${email}`);
+        console.log(`   → Service ID: ${EMAILJS_CONFIG.serviceId}`);
+        console.log(`   → Template ID (OTP): ${otpTemplateToUse}`);
+        console.log(`   → Public Key Present: ${!!EMAILJS_CONFIG.publicKey}`);
+        console.log(`   → Params Preview:`, { to_email: templateParams.to_email, otp: templateParams.otp, subject: template.subject });
         
         const result = await emailjs.send(
             EMAILJS_CONFIG.serviceId,
-            EMAILJS_CONFIG.templateId,
+            EMAILJS_CONFIG.bookingTemplateId || EMAILJS_CONFIG.templateId,
             templateParams
         );
         
@@ -257,84 +262,163 @@ export async function sendOtpEmail(email, otp, language = 'en') {
 
 // Send booking confirmation email to host
 export async function sendBookingConfirmationEmail(bookingData) {
-    const hostEmail = EMAILJS_CONFIG.fromEmail; // Your Gmail
-    const template = EMAIL_TEMPLATES.OTP_ENGLISH; // Use same template for now
-    
+    // Send to your inbox (EmailJS recipient)
+    const hostEmail = EMAILJS_CONFIG.fromEmail; // Ensure this equals the inbox you want
+
+    // Build a rich HTML with all details so even generic templates show content
+    const subject = `New Booking ${bookingData.bookingId || ''} - ${bookingData.pujaType || 'Service'}`;
+    const messageHtml = `
+        <div style="font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto;">
+            <h2 style="color:#1B5E20;">New Puja Booking</h2>
+            <table cellpadding="8" cellspacing="0" style="width:100%; border-collapse:collapse;">
+                <tr><td style="border-bottom:1px solid #eee; width:35%"><strong>Customer Name</strong></td><td style="border-bottom:1px solid #eee;">${bookingData.name || ''}</td></tr>
+                <tr><td style="border-bottom:1px solid #eee;"><strong>Phone</strong></td><td style="border-bottom:1px solid #eee;">${bookingData.phone || ''}</td></tr>
+                <tr><td style="border-bottom:1px solid #eee;"><strong>Email</strong></td><td style="border-bottom:1px solid #eee;">${bookingData.email || ''}</td></tr>
+                <tr><td style="border-bottom:1px solid #eee;"><strong>Puja Type</strong></td><td style="border-bottom:1px solid #eee;">${bookingData.pujaType || ''}</td></tr>
+                <tr><td style="border-bottom:1px solid #eee;"><strong>Date</strong></td><td style="border-bottom:1px solid #eee;">${bookingData.date || ''}</td></tr>
+                <tr><td style="border-bottom:1px solid #eee;"><strong>Time</strong></td><td style="border-bottom:1px solid #eee;">${bookingData.time || ''}</td></tr>
+                <tr><td style="border-bottom:1px solid #eee;"><strong>Amount</strong></td><td style="border-bottom:1px solid #eee;">₹${bookingData.amount ?? ''}</td></tr>
+                <tr><td style="border-bottom:1px solid #eee;"><strong>Address</strong></td><td style="border-bottom:1px solid #eee;">${bookingData.address || ''}</td></tr>
+                <tr><td style="border-bottom:1px solid #eee;"><strong>Special Requests</strong></td><td style="border-bottom:1px solid #eee;">${bookingData.specialRequests || 'None'}</td></tr>
+                <tr><td style="border-bottom:1px solid #eee;"><strong>Booking ID</strong></td><td style="border-bottom:1px solid #eee;">${bookingData.bookingId || ''}</td></tr>
+                <tr><td style="border-bottom:1px solid #eee;"><strong>Payment Status</strong></td><td style="border-bottom:1px solid #eee;">${bookingData.paymentStatus || ''}</td></tr>
+                <tr><td style="border-bottom:1px solid #eee;"><strong>Payment ID</strong></td><td style="border-bottom:1px solid #eee;">${bookingData.paymentId || ''}</td></tr>
+                <tr><td style="border-bottom:1px solid #eee;"><strong>Order ID</strong></td><td style="border-bottom:1px solid #eee;">${bookingData.orderId || ''}</td></tr>
+            </table>
+            <p style="color:#777; font-size:12px; margin-top:16px;">Timestamp: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}</p>
+        </div>
+    `;
+
     try {
         const templateParams = {
-            // Recipient (your email)
-            email: hostEmail,
+            // Recipient variants
             to_email: hostEmail,
             to: hostEmail,
             user_email: hostEmail,
+            email: hostEmail,
             reply_to: hostEmail,
-            
-            // Customer details
+
+            // Subject/message variants (to match common EmailJS templates)
+            subject,
+            message: messageHtml,
+            message_html: messageHtml,
+            html: messageHtml,
+            content: messageHtml,
+
+            // Individual fields for templates that map variables
             customer_name: bookingData.name,
             customer_phone: bookingData.phone,
             customer_email: bookingData.email,
-            
-            // Booking details
             puja_type: bookingData.pujaType,
             booking_date: bookingData.date,
             booking_time: bookingData.time,
             amount: bookingData.amount,
             address: bookingData.address,
             special_requests: bookingData.specialRequests || 'None',
-            
-            // Booking info
-            booking_id: bookingData.bookingId || `BK${Date.now()}`,
-            payment_status: bookingData.paymentStatus || 'Payment Successful',
-            booking_timestamp: new Date().toLocaleString('en-IN', {
-                timeZone: 'Asia/Kolkata',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            }),
-            
-            // Content
-            subject: 'New Puja Booking - Archanam',
-            message: `
-                <h2>New Puja Booking Received</h2>
-                <p><strong>Customer:</strong> ${bookingData.name}</p>
-                <p><strong>Phone:</strong> ${bookingData.phone}</p>
-                <p><strong>Email:</strong> ${bookingData.email}</p>
-                <p><strong>Puja Type:</strong> ${bookingData.pujaType}</p>
-                <p><strong>Date:</strong> ${bookingData.date}</p>
-                <p><strong>Time:</strong> ${bookingData.time}</p>
-                <p><strong>Amount:</strong> ₹${bookingData.amount}</p>
-                <p><strong>Address:</strong> ${bookingData.address}</p>
-                <p><strong>Special Requests:</strong> ${bookingData.specialRequests || 'None'}</p>
-                <p><strong>Booking ID:</strong> ${bookingData.bookingId}</p>
-                <p><strong>Payment Status:</strong> ${bookingData.paymentStatus}</p>
-            `,
+            booking_id: bookingData.bookingId,
+            payment_status: bookingData.paymentStatus,
+            payment_id: bookingData.paymentId,
+            order_id: bookingData.orderId,
+
             from_name: 'Archanam Booking System',
             from_email: EMAILJS_CONFIG.fromEmail
         };
-        
+
+        // Map to your existing template structure (Order-style)
+        // - order_id already supplied above for your header
+        // - email for footer notice
+        // - cost fields (flat, since nested objects may not bind in some templates)
+        templateParams.order_id = templateParams.order_id || (bookingData.bookingId || '');
+        templateParams.email = bookingData.email || '';
+        templateParams['cost.shipping'] = '0.00';
+        templateParams['cost.tax'] = '0.00';
+        templateParams['cost.total'] = typeof bookingData.amount === 'number' ? bookingData.amount.toFixed(2) : `${bookingData.amount || '0.00'}`;
+
+        // Orders list for {{#orders}} iteration: a single line item representing the puja/service
+        templateParams.orders = [
+            {
+                image_url: 'https://i.imgur.com/tQv4YvN.png',
+                name: bookingData.pujaType || 'Puja Service',
+                units: 1,
+                price: typeof bookingData.amount === 'number' ? bookingData.amount.toFixed(2) : `${bookingData.amount || '0.00'}`
+            }
+        ];
+
         console.log(`📧 Sending booking confirmation to host: ${hostEmail}`);
-        console.log(`📧 Booking details:`, bookingData);
-        
         const result = await emailjs.send(
             EMAILJS_CONFIG.serviceId,
-            EMAILJS_CONFIG.templateId,
+            otpTemplateToUse,
             templateParams
         );
-        
-        console.log(`✅ Booking confirmation sent to host successfully`);
-        console.log(`📧 Message ID: ${result.text}`);
-        
+
         return {
             success: true,
             messageId: result.text,
             provider: 'EmailJS'
         };
-        
     } catch (error) {
         console.error(`❌ Failed to send booking confirmation to host:`, error);
         throw new Error(`Booking confirmation email failed: ${error.text || error.message}`);
+    }
+}
+
+// Send booking confirmation to customer (client-facing email)
+export async function sendBookingCustomerEmail(bookingData) {
+    const customerEmail = bookingData.email;
+    const subject = `Your Booking is Confirmed - ${bookingData.pujaType || 'Puja Service'}`;
+    const messageHtml = `
+        <div style="font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto;">
+            <h2 style="color:#1B5E20;">Booking Confirmed ✅</h2>
+            <p>Dear ${bookingData.name || 'Devotee'},</p>
+            <p>Thank you for your booking. We have received your payment and confirmed your ${bookingData.pujaType || 'service'}.</p>
+            <table cellpadding="8" cellspacing="0" style="width:100%; border-collapse:collapse;">
+                <tr><td style="border-bottom:1px solid #eee; width:35%"><strong>Booking ID</strong></td><td style="border-bottom:1px solid #eee;">${bookingData.bookingId || ''}</td></tr>
+                <tr><td style="border-bottom:1px solid #eee;"><strong>Puja Type</strong></td><td style="border-bottom:1px solid #eee;">${bookingData.pujaType || ''}</td></tr>
+                <tr><td style="border-bottom:1px solid #eee;"><strong>Date</strong></td><td style="border-bottom:1px solid #eee;">${bookingData.date || ''}</td></tr>
+                <tr><td style="border-bottom:1px solid #eee;"><strong>Time</strong></td><td style="border-bottom:1px solid #eee;">${bookingData.time || ''}</td></tr>
+                <tr><td style="border-bottom:1px solid #eee;"><strong>Amount Paid</strong></td><td style="border-bottom:1px solid #eee;">₹${typeof bookingData.amount === 'number' ? bookingData.amount.toFixed(2) : (bookingData.amount || '')}</td></tr>
+                <tr><td style="border-bottom:1px solid #eee;"><strong>Payment ID</strong></td><td style="border-bottom:1px solid #eee;">${bookingData.paymentId || ''}</td></tr>
+                <tr><td style="border-bottom:1px solid #eee;"><strong>Order ID</strong></td><td style="border-bottom:1px solid #eee;">${bookingData.orderId || ''}</td></tr>
+            </table>
+            <p style="margin-top:16px">Our team will contact you with further details. If you have any questions, reply to this email.</p>
+            <p style="color:#777; font-size:12px; margin-top:16px;">Timestamp: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}</p>
+        </div>
+    `;
+
+    try {
+        const templateParams = {
+            to_email: customerEmail,
+            to: customerEmail,
+            user_email: customerEmail,
+            email: customerEmail,
+            reply_to: EMAILJS_CONFIG.fromEmail,
+            subject,
+            message: messageHtml,
+            message_html: messageHtml,
+            html: messageHtml,
+            content: messageHtml,
+            // Common fields for template mapping
+            customer_name: bookingData.name,
+            puja_type: bookingData.pujaType,
+            booking_id: bookingData.bookingId,
+            booking_date: bookingData.date,
+            booking_time: bookingData.time,
+            amount: bookingData.amount,
+            payment_id: bookingData.paymentId,
+            order_id: bookingData.orderId,
+            from_name: EMAILJS_CONFIG.fromName,
+            from_email: EMAILJS_CONFIG.fromEmail
+        };
+
+        const result = await emailjs.send(
+            EMAILJS_CONFIG.serviceId,
+            EMAILJS_CONFIG.templateId,
+            templateParams
+        );
+        return { success: true, messageId: result.text, provider: 'EmailJS' };
+    } catch (error) {
+        console.error('❌ Failed to send booking confirmation to customer:', error);
+        throw new Error(`Customer confirmation email failed: ${error.text || error.message}`);
     }
 }
 

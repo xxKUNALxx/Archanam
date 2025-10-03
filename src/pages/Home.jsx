@@ -54,7 +54,7 @@ const Footer = () => {
                             </div>
                             <div className="flex items-center space-x-2">
                                 <Mail className="w-4 h-4 text-[#FFB300]" />
-                                <span>info@bhaktiseva.com</span>
+                                <span>help.archnam@gmail.com</span>
                             </div>
                             <div className="flex items-center space-x-2">
                                 <MapPin className="w-4 h-4 text-[#FFB300]" />
@@ -65,9 +65,9 @@ const Footer = () => {
                     <div>
                         <h4 className="text-lg font-semibold mb-4 text-[#FFB300] font-serif">हमें फॉलो करें</h4>
                         <div className="flex space-x-4">
-                            <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center cursor-pointer hover:bg-[#FFB300] transition-all duration-300 transform hover:scale-110">📘</div>
-                            <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center cursor-pointer hover:bg-[#FFB300] transition-all duration-300 transform hover:scale-110">📷</div>
-                            <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center cursor-pointer hover:bg-[#FFB300] transition-all duration-300 transform hover:scale-110">🐦</div>
+                            <a href="https://www.facebook.com/share/16X1DQnvMZ/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center cursor-pointer hover:bg-[#FFB300] transition-all duration-300 transform hover:scale-110">📘</a>
+                            <a href="https://www.instagram.com/archnam108?igsh=bjU2YjVtczg2eG00" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center cursor-pointer hover:bg-[#FFB300] transition-all duration-300 transform hover:scale-110">📷</a>
+                            <a href="https://youtube.com/@archnam-n8c?si=xy1KwaUpwA5oh5kA" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center cursor-pointer hover:bg-[#FFB300] transition-all duration-300 transform hover:scale-110">📺</a>
                         </div>
                     </div>
                 </div>
@@ -495,7 +495,7 @@ const Home = () => {
                             <div className="text-center p-6 bg-white/10 backdrop-blur-sm rounded-2xl transform transition-transform duration-300 hover:scale-105">
                                 <Mail className="w-12 h-12 mx-auto mb-4 text-[#FFB300]" />
                                 <h3 className="text-xl font-semibold mb-2 font-devanagari">हमें ईमेल करें</h3>
-                                <p className="opacity-90">info@bhaktiseva.com</p>
+                                <p className="opacity-90">help.archnam@gmail.com</p>
                             </div>
                             <div className="text-center p-6 bg-white/10 backdrop-blur-sm rounded-2xl transform transition-transform duration-300 hover:scale-105">
                                 <MapPin className="w-12 h-12 mx-auto mb-4 text-[#FFB300]" />

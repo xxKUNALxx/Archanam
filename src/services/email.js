@@ -2,21 +2,31 @@
 // Uses EmailJS for browser-compatible email sending
 
 import emailjs from '@emailjs/browser';
+import {
+    EMAILJS_SERVICE_ID,
+    EMAILJS_PUBLIC_KEY,
+    EMAILJS_TEMPLATE_ID,
+    EMAILJS_OTP_TEMPLATE_ID,
+    EMAILJS_BOOKING_TEMPLATE_ID,
+    EMAIL_FROM_NAME,
+    EMAIL_FROM_ADDRESS
+} from '../config/env.js';
 
 // EmailJS Configuration
 const EMAILJS_CONFIG = {
-    // Get these from https://www.emailjs.com/
-    serviceId: 'service_y8omb6d', // Replace with your actual EmailJS service ID
-    templateId: 'template_n6h5s5t', // legacy default
-    otpTemplateId: 'template_n6h5s5t', // OTP template ID
-    bookingTemplateId: 'template_snx5d52', // Admin booking template ID
-    publicKey: '2kX9-9LSRIJM5TiOd', // Replace with your EmailJS public key
-    fromName: 'अर्चनम्',
-    fromEmail: 'danteonhunt@gmail.com'
+    serviceId: EMAILJS_SERVICE_ID,
+    templateId: EMAILJS_TEMPLATE_ID,
+    otpTemplateId: EMAILJS_OTP_TEMPLATE_ID,
+    bookingTemplateId: EMAILJS_BOOKING_TEMPLATE_ID,
+    publicKey: EMAILJS_PUBLIC_KEY,
+    fromName: EMAIL_FROM_NAME,
+    fromEmail: EMAIL_FROM_ADDRESS
 };
 
 // Initialize EmailJS
-emailjs.init(EMAILJS_CONFIG.publicKey);
+if (EMAILJS_CONFIG.publicKey) {
+    emailjs.init(EMAILJS_CONFIG.publicKey);
+}
 
 // Email templates
 const EMAIL_TEMPLATES = {
@@ -183,7 +193,7 @@ export async function sendOtpEmail(email, otp, language = 'en') {
     }
     
     // Validate EmailJS configuration (only fail if actually missing)
-    if (!EMAILJS_CONFIG.serviceId || !EMAILJS_CONFIG.templateId || !EMAILJS_CONFIG.publicKey) {
+    if (!EMAILJS_CONFIG.serviceId || !EMAILJS_CONFIG.otpTemplateId || !EMAILJS_CONFIG.publicKey) {
         throw new Error('EmailJS configuration incomplete. Please set up your EmailJS credentials.');
     }
     
@@ -209,17 +219,17 @@ export async function sendOtpEmail(email, otp, language = 'en') {
             language: language
         };
         
-        const otpTemplateToUse = EMAILJS_CONFIG.otpTemplateId || EMAILJS_CONFIG.templateId;
         console.log(`📧 Sending OTP email via EmailJS`);
         console.log(`   → To: ${email}`);
         console.log(`   → Service ID: ${EMAILJS_CONFIG.serviceId}`);
-        console.log(`   → Template ID (OTP): ${otpTemplateToUse}`);
+        console.log(`   → Template ID (OTP): ${EMAILJS_CONFIG.otpTemplateId}`);
         console.log(`   → Public Key Present: ${!!EMAILJS_CONFIG.publicKey}`);
         console.log(`   → Params Preview:`, { to_email: templateParams.to_email, otp: templateParams.otp, subject: template.subject });
         
+        // ✅ FIXED: Use otpTemplateId specifically for OTP emails
         const result = await emailjs.send(
             EMAILJS_CONFIG.serviceId,
-            EMAILJS_CONFIG.bookingTemplateId || EMAILJS_CONFIG.templateId,
+            EMAILJS_CONFIG.otpTemplateId,
             templateParams
         );
         
@@ -263,7 +273,7 @@ export async function sendOtpEmail(email, otp, language = 'en') {
 // Send booking confirmation email to host
 export async function sendBookingConfirmationEmail(bookingData) {
     // Send to your inbox (EmailJS recipient)
-    const hostEmail = EMAILJS_CONFIG.fromEmail; // Ensure this equals the inbox you want
+    const hostEmail = EMAILJS_CONFIG.fromEmail;
 
     // Build a rich HTML with all details so even generic templates show content
     const subject = `New Booking ${bookingData.bookingId || ''} - ${bookingData.pujaType || 'Service'}`;
@@ -325,16 +335,13 @@ export async function sendBookingConfirmationEmail(bookingData) {
         };
 
         // Map to your existing template structure (Order-style)
-        // - order_id already supplied above for your header
-        // - email for footer notice
-        // - cost fields (flat, since nested objects may not bind in some templates)
         templateParams.order_id = templateParams.order_id || (bookingData.bookingId || '');
         templateParams.email = bookingData.email || '';
         templateParams['cost.shipping'] = '0.00';
         templateParams['cost.tax'] = '0.00';
         templateParams['cost.total'] = typeof bookingData.amount === 'number' ? bookingData.amount.toFixed(2) : `${bookingData.amount || '0.00'}`;
 
-        // Orders list for {{#orders}} iteration: a single line item representing the puja/service
+        // Orders list for {{#orders}} iteration
         templateParams.orders = [
             {
                 image_url: 'https://i.imgur.com/tQv4YvN.png',
@@ -345,9 +352,11 @@ export async function sendBookingConfirmationEmail(bookingData) {
         ];
 
         console.log(`📧 Sending booking confirmation to host: ${hostEmail}`);
+        
+        // ✅ FIXED: Use bookingTemplateId from EMAILJS_CONFIG
         const result = await emailjs.send(
             EMAILJS_CONFIG.serviceId,
-            otpTemplateToUse,
+            EMAILJS_CONFIG.bookingTemplateId,
             templateParams
         );
 

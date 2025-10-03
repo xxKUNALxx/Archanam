@@ -1,15 +1,24 @@
 // EmailJS service for OTP emails only
 import emailjs from '@emailjs/browser';
+import {
+    EMAILJS_SERVICE_ID,
+    EMAILJS_PUBLIC_KEY,
+    EMAILJS_OTP_TEMPLATE_ID,
+    EMAIL_FROM_NAME,
+    EMAIL_FROM_ADDRESS
+} from '../config/env.js';
 
 const EMAILJS_CONFIG = {
-    serviceId: 'service_y8omb6d',
-    otpTemplateId: 'template_n6h5s5t',
-    publicKey: '2kX9-9LSRIJM5TiOd',
-    fromName: 'अर्चनम्',
-    fromEmail: 'danteonhunt@gmail.com'
+    serviceId: EMAILJS_SERVICE_ID,
+    otpTemplateId: EMAILJS_OTP_TEMPLATE_ID,
+    publicKey: EMAILJS_PUBLIC_KEY,
+    fromName: EMAIL_FROM_NAME,
+    fromEmail: EMAIL_FROM_ADDRESS
 };
 
-emailjs.init(EMAILJS_CONFIG.publicKey);
+if (EMAILJS_CONFIG.publicKey) {
+    emailjs.init(EMAILJS_CONFIG.publicKey);
+}
 
 export async function sendOtpEmail(email, otp, language = 'en') {
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -49,5 +58,6 @@ export async function sendOtpEmail(email, otp, language = 'en') {
 export function getOtpEmailConfig() {
     return { serviceId: EMAILJS_CONFIG.serviceId, templateId: EMAILJS_CONFIG.otpTemplateId };
 }
+
 
 

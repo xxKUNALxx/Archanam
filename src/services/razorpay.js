@@ -1,12 +1,13 @@
 // Razorpay payment integration service
+import { RAZORPAY_KEY_ID, CURRENCY, MERCHANT_NAME, UPI_ID } from '../config/env.js';
 
 // Razorpay configuration
 const RAZORPAY_CONFIG = {
-    key: 'rzp_test_RMzUqA0LdgjjXC', // Replace with your actual Razorpay key from dashboard
-    currency: 'INR',
-    name: 'अर्चनम्',
+    key: RAZORPAY_KEY_ID,
+    currency: CURRENCY,
+    name: MERCHANT_NAME,
     description: 'Puja Booking Service',
-    image: 'https://picsum.photos/150/150', // Use a reliable placeholder image service
+    image: 'https://picsum.photos/150/150',
     theme: {
         color: '#FFB300'
     }
@@ -48,7 +49,7 @@ export async function createRazorpayOrder(amount, bookingDetails) {
     // Razorpay will handle the actual order creation
     return {
         amount: amount * 100, // Convert to paise
-        currency: 'INR',
+        currency: CURRENCY,
         receipt: `receipt_${bookingDetails.bookingId || Date.now()}`,
         bookingDetails: bookingDetails
     };
@@ -216,7 +217,7 @@ export function testMinimalPayment() {
     const options = {
         key: RAZORPAY_CONFIG.key,
         amount: 100, // ₹1.00
-        currency: 'INR',
+        currency: CURRENCY,
         name: 'Test',
         description: 'Test Payment',
         handler: function (response) {
@@ -363,7 +364,7 @@ export function testIndianPayment() {
     const options = {
         key: RAZORPAY_CONFIG.key,
         amount: 100, // ₹1.00
-        currency: 'INR',
+        currency: CURRENCY,
         name: 'अर्चनम्',
         description: 'Indian Payment Test',
         method: {
@@ -527,8 +528,8 @@ export function initializeUPIPayment(amount, bookingDetails, onSuccess, onError)
 
 // Generate UPI QR Code for payment
 export function generateUPIQR(amount, description = 'Puja Booking') {
-    const upiId = 'test@razorpay'; // Replace with your actual UPI ID
-    const merchantName = 'अर्चनम्';
+    const upiId = UPI_ID || 'test@razorpay';
+    const merchantName = MERCHANT_NAME;
     const transactionId = `TXN${Date.now()}`;
     
     // UPI payment URL

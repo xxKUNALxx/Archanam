@@ -1,15 +1,24 @@
 // EmailJS service for admin order confirmation only
 import emailjs from '@emailjs/browser';
+import {
+    EMAILJS_SERVICE_ID,
+    EMAILJS_PUBLIC_KEY,
+    EMAILJS_BOOKING_TEMPLATE_ID,
+    EMAIL_FROM_NAME,
+    EMAIL_FROM_ADDRESS
+} from '../config/env.js';
 
 const EMAILJS_CONFIG = {
-    serviceId: 'service_y8omb6d',
-    bookingTemplateId: 'template_snx5d52',
-    publicKey: '2kX9-9LSRIJM5TiOd',
-    fromName: 'अर्चनम्',
-    fromEmail: 'danteonhunt@gmail.com'
+    serviceId: EMAILJS_SERVICE_ID,
+    bookingTemplateId: EMAILJS_BOOKING_TEMPLATE_ID,
+    publicKey: EMAILJS_PUBLIC_KEY,
+    fromName: EMAIL_FROM_NAME,
+    fromEmail: EMAIL_FROM_ADDRESS
 };
 
-emailjs.init(EMAILJS_CONFIG.publicKey);
+if (EMAILJS_CONFIG.publicKey) {
+    emailjs.init(EMAILJS_CONFIG.publicKey);
+}
 
 export async function sendBookingConfirmationEmail(bookingData) {
     const hostEmail = EMAILJS_CONFIG.fromEmail;
@@ -74,5 +83,6 @@ export async function sendBookingConfirmationEmail(bookingData) {
 export function getOrderEmailConfig() {
     return { serviceId: EMAILJS_CONFIG.serviceId, templateId: EMAILJS_CONFIG.bookingTemplateId };
 }
+
 
 

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Phone, Mail, MapPin, Calendar, Clock, User, CheckCircle, ArrowLeft, ArrowRight, CreditCard, Shield, Loader2 } from 'lucide-react';
+import { Phone, Mail, MapPin, Calendar, Clock, User, CheckCircle, ArrowLeft, ArrowRight, CreditCard, Shield, Loader2, QrCode, Smartphone, X } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import Navbar from '../components/Navbar';
 import { sendOtp, verifyOtp } from '../services/otp';
 import { createBooking, updateBooking } from '../services/bookingStore';
-import { loadRazorpayScript, createRazorpayOrder, initializeRazorpayPayment, BOOKING_STATUS, initializeUPIPayment } from '../services/razorpay';
-import { sendBookingConfirmationEmail } from '../services/emailOrder';
+import { loadRazorpayScript, createRazorpayOrder, initializeRazorpayPayment, BOOKING_STATUS, testRazorpayConfig, testMinimalPayment, testRazorpayAccount, testIndianPayment, getTestCardInfo, testUPIPayment, generateUPIQR, testUPIQR, initializeUPIPayment } from '../services/razorpay';
+import { sendBookingConfirmationEmail } from '../services/email';
 
 const Booking = () => {
     const { language } = useLanguage();
@@ -38,6 +38,7 @@ const Booking = () => {
     });
 
     const [errors, setErrors] = useState({});
+    const [showTestInfo, setShowTestInfo] = useState(false);
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('card');
 
     // Site services with pricing (from pages: MalaPage & NirmalyaPage)
@@ -181,7 +182,83 @@ const Booking = () => {
     };
 
     // Test function for debugging Razorpay
-    // No explicit test helpers in production-like booking UI
+    const testRazorpay = async () => {
+        console.log('🧪 Testing Razorpay...');
+        
+        // Test 1: Configuration
+        testRazorpayConfig();
+        
+        // Test 2: Account API
+        const accountTest = await testRazorpayAccount();
+        console.log('Account test result:', accountTest);
+        
+        // Test 3: Minimal payment
+        if (accountTest.success) {
+            testMinimalPayment();
+        } else {
+            console.error('❌ Account test failed, skipping payment test');
+        }
+    };
+
+    // Test payment function
+    const handleTestPayment = async () => {
+        console.log('🧪 Testing Indian Payment...');
+        setLoading(true);
+        try {
+            // Load Razorpay script
+            await loadRazorpayScript();
+            
+            // Test Indian payment
+            testIndianPayment();
+            
+            // Show test card info
+            const testInfo = getTestCardInfo();
+            console.log('🇮🇳 Test Card Info:', testInfo);
+            setShowTestInfo(true);
+            
+        } catch (error) {
+            console.error('❌ Test payment failed:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Test UPI payment function
+    const handleTestUPI = async () => {
+        console.log('📱 Testing UPI Payment...');
+        setLoading(true);
+        try {
+            await loadRazorpayScript();
+            
+            // Use UPI-only payment for testing
+            initializeUPIPayment(
+                1, // ₹1 test amount
+                {
+                    pujaType: 'Test Puja',
+                    name: 'Test User',
+                    bookingId: `TEST${Date.now()}`
+                },
+                (response) => {
+                    console.log('✅ UPI test payment successful:', response);
+                    setLoading(false);
+                },
+                (error) => {
+                    console.error('❌ UPI test payment failed:', error);
+                    setLoading(false);
+                }
+            );
+        } catch (error) {
+            console.error('❌ UPI test failed:', error);
+            setLoading(false);
+        }
+    };
+
+    // Generate UPI QR code
+    const handleGenerateQR = () => {
+        const qrData = generateUPIQR(formData.amount, `${selectedPuja?.label} - ${formData.name}`);
+        console.log('📱 Generated UPI QR:', qrData);
+        setShowQRGenerator(true);
+    };
 
     // Handle payment method selection
     const handlePaymentMethodChange = (method) => {
@@ -192,6 +269,9 @@ const Booking = () => {
     const handlePayment = async () => {
         setLoading(true);
         try {
+            // Test Razorpay configuration first
+            testRazorpayConfig();
+            
             // Load Razorpay script
             await loadRazorpayScript();
             
@@ -203,6 +283,7 @@ const Booking = () => {
             
             // Choose payment method
             if (selectedPaymentMethod === 'upi') {
+                // Use UPI-only payment
                 initializeUPIPayment(
                     formData.amount,
                     formData,
@@ -227,8 +308,7 @@ const Booking = () => {
                                 ...formData,
                                 bookingId: updatedBooking?.bookingId || `BK${Date.now()}`,
                                 paymentStatus: 'Payment Successful',
-                                amount: formData.amount,
-                                pujaType: selectedService?.label || formData.serviceType
+                                amount: formData.amount
                             });
                             console.log('✅ Booking confirmation email sent to host');
                         } catch (emailError) {
@@ -268,8 +348,7 @@ const Booking = () => {
                                 ...formData,
                                 bookingId: updatedBooking?.bookingId || `BK${Date.now()}`,
                                 paymentStatus: 'Payment Successful',
-                                amount: formData.amount,
-                                pujaType: selectedService?.label || formData.serviceType
+                                amount: formData.amount
                             });
                             console.log('✅ Booking confirmation email sent to host');
                         } catch (emailError) {
@@ -319,8 +398,8 @@ const Booking = () => {
                         </h2>
                         <p className="text-gray-600 mb-4">
                             {language === 'hi' 
-                                ? `आपकी ${selectedService?.label || ''} सफलतापूर्वक बुक हो गई है।` 
-                                : `Your ${selectedService?.label || ''} has been successfully booked.`
+                                ? `आपकी ${selectedPuja?.label} सफलतापूर्वक बुक हो गई है।` 
+                                : `Your ${selectedPuja?.label} has been successfully booked.`
                             }
                         </p>
                         <p className="text-gray-600 mb-6">
@@ -394,7 +473,7 @@ const Booking = () => {
                                         </div>
                                         <div className="flex items-center space-x-3">
                                             <Mail className="w-5 h-5 text-[#FFB300]" />
-                                            <span>help.archnam@gmail.com</span>
+                                            <span>info@bhaktiseva.com</span>
                                         </div>
                                         <div className="flex items-center space-x-3">
                                             <MapPin className="w-5 h-5 text-[#FFB300]" />
@@ -736,11 +815,60 @@ const Booking = () => {
                                                         : 'border-gray-200 hover:border-gray-300'
                                                 }`}
                                             >
-                                                {/* UPI icon removed with test UI cleanup */}
+                                                <Smartphone className="w-6 h-6 mx-auto mb-2 text-gray-600" />
                                                 <span className="text-sm font-medium">UPI</span>
                                             </button>
                                         </div>
                                     </div>
+
+                                    {/* UPI Options */}
+                                    {selectedPaymentMethod === 'upi' && (
+                                        <div className="space-y-3 mb-4">
+                                            <button
+                                                type="button"
+                                                onClick={handleTestUPI}
+                                                disabled={loading}
+                                                className="w-full bg-green-500 text-white py-2 rounded-lg font-semibold hover:bg-green-600 transition-colors disabled:opacity-50 flex items-center justify-center space-x-2"
+                                            >
+                                                <Smartphone className="w-4 h-4" />
+                                                <span>{loading ? 'Testing...' : 'Test UPI Payment'}</span>
+                                            </button>
+                                            
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <button
+                                                    type="button"
+                                                    onClick={handleGenerateQR}
+                                                    className="bg-purple-500 text-white py-2 rounded-lg font-semibold hover:bg-purple-600 transition-colors flex items-center justify-center space-x-2"
+                                                >
+                                                    <QrCode className="w-4 h-4" />
+                                                    <span>Generate QR</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Test Button for Debugging */}
+                                    <button
+                                        type="button"
+                                        onClick={handleTestPayment}
+                                        disabled={loading}
+                                        className="w-full bg-blue-500 text-white py-2 rounded-lg font-semibold hover:bg-blue-600 transition-colors mb-4 disabled:opacity-50"
+                                    >
+                                        {loading ? '🧪 Testing...' : '🧪 Test All Payment Methods (₹1)'}
+                                    </button>
+
+                                    {/* Test Card Information */}
+                                    {showTestInfo && (
+                                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                                            <h4 className="font-semibold text-yellow-800 mb-2">🇮🇳 Test Information:</h4>
+                                            <div className="text-sm text-yellow-700 space-y-1">
+                                                <div><strong>Card:</strong> 4111 1111 1111 1111</div>
+                                                <div><strong>Expiry:</strong> 12/25</div>
+                                                <div><strong>CVV:</strong> 123</div>
+                                                <div><strong>UPI:</strong> test@razorpay</div>
+                                            </div>
+                                        </div>
+                                    )}
 
                                     <div className="flex space-x-4">
                                         <button
@@ -778,7 +906,72 @@ const Booking = () => {
             </div>
 
 
-            {/* QR modal removed in cleanup */}
+            {/* QR Generator Modal */}
+            {showQRGenerator && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center space-x-2">
+                                <QrCode className="w-6 h-6 text-blue-600" />
+                                <h3 className="text-lg font-semibold text-gray-800">UPI QR Code</h3>
+                            </div>
+                            <button
+                                onClick={() => setShowQRGenerator(false)}
+                                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                            >
+                                <X className="w-5 h-5 text-gray-500" />
+                            </button>
+                        </div>
+                        
+                        <div className="text-center">
+                            <div className="bg-gray-100 rounded-lg p-8 mb-4">
+                                <QrCode className="w-32 h-32 mx-auto text-gray-400" />
+                                <p className="text-sm text-gray-600 mt-2">QR Code will be generated here</p>
+                            </div>
+                            
+                            <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                                <div className="space-y-2 text-sm">
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">Amount:</span>
+                                        <span className="font-semibold">₹{formData.amount}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">UPI ID:</span>
+                                        <span className="font-semibold text-blue-600">test@razorpay</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div className="space-y-3">
+                                <button
+                                    onClick={() => {
+                                        // Generate actual QR code
+                                        const qrData = generateUPIQR(formData.amount, `${selectedService?.label} - ${formData.name}`);
+                                        console.log('Generated QR:', qrData);
+                                        alert('QR Code generated! Check console for details.');
+                                    }}
+                                    className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-600 transition-colors"
+                                >
+                                    Generate QR Code
+                                </button>
+                                
+                                <button
+                                    onClick={() => setShowQRGenerator(false)}
+                                    className="w-full bg-gray-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-gray-600 transition-colors"
+                                >
+                                    Close
+                                </button>
+                            </div>
+                            
+                            <div className="mt-4 text-xs text-gray-500">
+                                <p>1. Open any UPI app (PhonePe, Google Pay, Paytm)</p>
+                                <p>2. Scan this QR code</p>
+                                <p>3. Complete the payment</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

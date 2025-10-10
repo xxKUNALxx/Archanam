@@ -28,6 +28,20 @@ export async function sendOtpEmail(email, otp, language = 'en') {
         throw new Error('Invalid OTP format');
     }
 
+    // Check if EmailJS is properly configured
+    if (!EMAILJS_CONFIG.publicKey || !EMAILJS_CONFIG.serviceId || !EMAILJS_CONFIG.otpTemplateId) {
+        console.warn('⚠️ EmailJS not configured. Using development mode.');
+        console.log(`📧 [DEV MODE] OTP for ${email}: ${otp}`);
+        console.log('📧 [DEV MODE] In production, this would be sent via EmailJS');
+        
+        // Simulate successful email sending
+        return { 
+            success: true, 
+            messageId: `dev-${Date.now()}`, 
+            provider: 'Development Mode' 
+        };
+    }
+
     const recipientName = email.split('@')[0];
     const templateParams = {
         to_email: email,

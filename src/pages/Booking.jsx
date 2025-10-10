@@ -40,6 +40,7 @@ const Booking = () => {
     const [errors, setErrors] = useState({});
     const [showTestInfo, setShowTestInfo] = useState(false);
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('card');
+    const [showQRGenerator, setShowQRGenerator] = useState(false);
 
     // Site services with pricing (from pages: MalaPage & NirmalyaPage)
     const services = [

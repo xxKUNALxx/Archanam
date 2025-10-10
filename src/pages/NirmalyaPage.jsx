@@ -235,7 +235,10 @@ const NirmalyaPage = () => {
                     font-style: italic;
                 }
             `}</style>
+        
         </div>
+        
+    
     );
 };
 

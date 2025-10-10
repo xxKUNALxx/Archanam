@@ -8,7 +8,7 @@ import AIPage, { FloatingPujaChatbot } from './AI';
 import AstrologyPage from './AstrologyPage';
 
 // Main Home page image URLs
-const homeBgUrl = 'https://plus.unsplash.com/premium_photo-1697730326674-74b6c70509f4?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+const homeBgUrl = '/mandir.png';
 const Yagya = 'https://i.pinimg.com/1200x/63/5f/60/635f60ca8b55e2adf8fbc8a94809b150.jpg';
 const Pooja = 'https://i.pinimg.com/736x/ec/02/63/ec026397423fd6a9196d9a4f409e013d.jpg';
 const Mala = 'https://boondltd.com/wp-content/uploads/2024/01/mixed.png';
@@ -239,25 +239,12 @@ const Home = () => {
         }
         return (
             <>
-                {/* Hero Section - Home Page with Om signs and Banana Trees */}
+                {/* Hero Section - Home Page */}
                 <section ref={heroRef} id="home" className="relative pt-16 sm:pt-20 min-h-screen flex items-center justify-center overflow-hidden bg-cover bg-center sm:bg-fixed" style={{ backgroundImage: `url(${homeBgUrl})` }}>
                     <div className="absolute inset-0 bg-gradient-to-b from-[#000000]/60 to-[#000000]/40 z-0"></div>
                     <div className="absolute inset-0 z-10 pointer-events-none">
                         <div className="w-full h-full relative">
-                            {/* Banana trees on both sides */}
-                            <img
-                                src="/banana.png"
-                                alt="Banana Tree Left"
-                                className="select-none opacity-80"
-                                style={{ position: 'absolute', left: '-120px', bottom: '-20px', height: '75vh', width: 'auto', transformOrigin: 'bottom center', animation: 'sway 5s ease-in-out infinite' }}
-                            />
-                            <img
-                                src="/banana.png"
-                                alt="Banana Tree Right"
-                                className="select-none opacity-80"
-                                style={{ position: 'absolute', right: '-120px', bottom: '-20px', height: '75vh', width: 'auto', transform: 'scaleX(-1)', transformOrigin: 'bottom center', animation: 'sway 5s ease-in-out infinite' }}
-                            />
-                            
+                            {/* Decorative layer intentionally left blank */}
                         </div>
                     </div>
                     <div className="container mx-auto px-4 relative z-20 text-center text-white">

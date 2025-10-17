@@ -1,9 +1,16 @@
 // Razorpay payment integration service
-// Temporary fix - hardcoded values to resolve build error
-const RAZORPAY_KEY_ID = 'rzp_test_ROwpcjCWzDBLkC';
-const CURRENCY = 'INR';
-const MERCHANT_NAME = 'अर्चनम्';
-const UPI_ID = 'test@razorpay';
+// Environment variable access
+const RAZORPAY_KEY_ID = import.meta.env.RAZORPAY_KEY_ID;
+const CURRENCY = import.meta.env.CURRENCY;
+const MERCHANT_NAME = import.meta.env.MERCHANT_NAME;
+const UPI_ID = import.meta.env.UPI_ID;
+
+console.log('Razorpay env loaded:', {
+  key: RAZORPAY_KEY_ID ? 'YES' : 'NO',
+  currency: CURRENCY,
+  merchant: MERCHANT_NAME,
+  upi: UPI_ID
+});
 
 // Razorpay configuration
 const RAZORPAY_CONFIG = {

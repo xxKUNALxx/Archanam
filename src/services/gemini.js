@@ -1,8 +1,9 @@
 // ✅ Minimal Gemini service wrapper with v1beta API (fixed 404 issue)
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Direct environment variable access with fallback
-const apiKey = import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSyAr5EQXzbHJGTerZL1A1C44pGSNaAwfdrI';
+// Environment variable access
+const apiKey = import.meta.env.GEMINI_API_KEY;
+console.log('Gemini API Key loaded:', apiKey ? 'YES' : 'NO', apiKey?.substring(0, 10) + '...');
 let client;
 
 function getClient() {

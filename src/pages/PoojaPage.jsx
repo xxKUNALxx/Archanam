@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Leaf, Award, Handshake, Globe, Star, Clock, CheckCircle, ArrowRight } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
+import { t } from '../utils/translations';
 import janeyu from '../../public/janeyu.png'
 import office from '../../public/office.png'
 import durga from '../../public/durga.png'
@@ -31,11 +33,12 @@ const poojaService1 = 'https://images.unsplash.com/photo-1598379435436-1e0c2b2a2
 const poojaService2 = 'https://images.unsplash.com/photo-1557020815-51e9e09d0a6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80';
 const poojaService3 = 'https://images.unsplash.com/photo-1582035905152-4a0b2b2a2b2c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80';
 
-const poojaServices = [
+// Function to get translated pooja services
+const getPoojaServices = (language) => [
 	{
-		title: "नए ऑफिस की प्रवेश पूजा",
+		title: t('pooja.services.officeInauguration.title', language),
 		image: office,
-		shortDesc: "नए कार्यस्थल में सकारात्मक ऊर्जा, सफलता और समृद्धि हेतु शुभ अनुष्ठान।",
+		shortDesc: t('pooja.services.officeInauguration.shortDesc', language),
 		content: `नए ऑफिस की प्रवेश पूजा (Office Inauguration Puja) बहुत ही शुभ और मंगलकारी मानी जाती है। यह पूजा नए कार्यस्थल को सकारात्मक ऊर्जा से भरने, व्यापार/ऑफिस में सफलता, समृद्धि और बाधा-रहित कार्य हेतु की जाती है।
 -
 -शुभ मुहूर्त
@@ -51,9 +54,9 @@ const poojaServices = [
 -गणेश-लक्ष्मी चित्र लगाएँ, तिजोरी उत्तर/ईशान में रखें, दीपक/नारियल से शुभारंभ करें, उसी दिन कोई लेन-देन अवश्य करें।`
 	},
 	{
-		title: "शिव रुद्राभिषेक पूजा",
+		title: t('pooja.services.shivRudrabhishek.title', language),
 		image: shivrudra,
-		shortDesc: "जल, दूध, पंचामृत से शिव अभिषेक; कष्ट शांति और सुख-समृद्धि।",
+		shortDesc: t('pooja.services.shivRudrabhishek.shortDesc', language),
 		content: `रुद्राभिषेक में शिवलिंग पर जल, दूध, दही, घी, शहद, गंगाजल आदि से अभिषेक किया जाता है।
 -
 -सामग्री
@@ -69,9 +72,9 @@ const poojaServices = [
 - सोमवार, प्रदोष, महाशिवरात्रि, श्रावण में विशेष। घर या मंदिर में संभव।`
 	},
 	{
-		title: "महालक्ष्मी पूजन",
+		title: t('pooja.services.mahalaxmiPujan.title', language),
 		image: mahalaxmi,
-		shortDesc: "धन, ऐश्वर्य, सौभाग्य हेतु दीपावली/शुक्रवार का विशेष पूजन।",
+		shortDesc: t('pooja.services.mahalaxmiPujan.shortDesc', language),
 		content: `महालक्ष्मी पूजन धन, ऐश्वर्य और सौभाग्य के लिए। दीपावली, कोजागरी पूर्णिमा, शुक्रवार, नए व्यापार/गृह प्रवेश पर विशेष।
 -
 -सामग्री
@@ -84,9 +87,9 @@ const poojaServices = [
 -दरिद्रता नाश, धन-वैभव वृद्धि, व्यापार/नौकरी में उन्नति, शांति और सौभाग्य।`
 	},
 	{
-		title: "यज्ञोपवीत (जनेऊ) संस्कार",
+		title: t('pooja.services.yajnopavit.title', language),
 		image: janeyu,
-		shortDesc: "उपनयन संस्कार से द्विजत्व, गायत्री दीक्षा और वैदिक अधिकार।",
+		shortDesc: t('pooja.services.yajnopavit.shortDesc', language),
 		content: `उपनयन/यज्ञोपवीत संस्कार वैदिक अधिकार और आचार-पथ की शुरुआत।
 -
 -महत्व
@@ -102,9 +105,9 @@ const poojaServices = [
 -सामान्यतः 7–12 वर्ष; परंतु मुहूर्तानुसार किसी भी आयु में संभव।`
 	},
 	{
-		title: "नामकरण पूजा संस्कार",
+		title: t('pooja.services.namkaran.title', language),
 		image: naamkaran,
-		shortDesc: "जन्म के 11/12/13वें दिन या मुहूर्त में शिशु का नामकरण।",
+		shortDesc: t('pooja.services.namkaran.shortDesc', language),
 		content: `नामकरण संस्कार शिशु की सामाजिक-धार्मिक पहचान का प्रारंभ।
 -
 -समय
@@ -120,9 +123,9 @@ const poojaServices = [
 -नाम शुभ, सरल और अर्थपूर्ण; नक्षत्र/राशि/परंपरा अनुसार।`
 	},
 	{
-		title: "चंडी हवन पूजा",
+		title: t('pooja.services.chandiHavan.title', language),
 		image: chandi,
-		shortDesc: "देवी चंडी उपासना; शत्रु नाश, भय शमन और विजय।",
+		shortDesc: t('pooja.services.chandiHavan.shortDesc', language),
 		content: `चंडी हवन अत्यंत शक्तिशाली और प्रभावशाली पूजा मानी जाती है। यह देवी माँ दुर्गा के उग्र रूप माँ चंडी (महाकाली, महालक्ष्मी और महासरस्वती का संयुक्त रूप) की उपासना है। इसे विशेष रूप से नवरात्रि, अष्टमी, नवमी, दुर्गा सप्तशती पाठ या बड़ी बाधाओं को दूर करने हेतु किया जाता है।
 
 महत्व
@@ -163,9 +166,9 @@ const poojaServices = [
 - हवन के समय शुद्ध आचरण और सात्त्विकता का पालन करना आवश्यक है।`
 	},
 	{
-		title: "नवग्रह पूजन हवन",
+		title: t('pooja.services.navgrahPujan.title', language),
 		image: navgrah,
-		shortDesc: "नवग्रह शांति हेतु जप-हवन; दोष शमन और उन्नति।",
+		shortDesc: t('pooja.services.navgrahPujan.shortDesc', language),
 		content: `नवग्रह पूजन सूर्य-चन्द्र-मंगल-बुध-गुरु-शुक्र-शनि-राहु-केतु की शांति हेतु।
 -
 -महत्व
@@ -184,9 +187,9 @@ const poojaServices = [
 - सोम/शनिवार/अमावस्या में फलदायी; नए आरंभ में शुभ।`
 	},
 	{
-		title: "महामृत्युंजय हवन पूजा",
+		title: t('pooja.services.mahamrityunjay.title', language),
 		image: mahamritu,
-		shortDesc: "आयु वृद्धि, रोग शांति और अकाल मृत्यु से रक्षा हेतु हवन।",
+		shortDesc: t('pooja.services.mahamrityunjay.shortDesc', language),
 		content: `महामृत्युंजय हवन भगवान शिव के महामृत्युंजय रूप को समर्पित है। यह अनुष्ठान आयु वृद्धि, रोग शांति, अकाल मृत्यु से रक्षा, मानसिक-शारीरिक स्वास्थ्य और जीवन की समृद्धि हेतु अत्यंत प्रभावी माना गया है।
 
 महत्व
@@ -224,9 +227,9 @@ const poojaServices = [
 - विशेषकर सोमवार, प्रदोष, महाशिवरात्रि या किसी भी शुभ मुहूर्त में यह हवन सर्वोत्तम फल देता है।`
 	},
 	{
-		title: "दुर्गा हवन पूजा",
+		title: t('pooja.services.durgaHavan.title', language),
 		image: durga,
-		shortDesc: "माँ दुर्गा प्रसन्नता हेतु हवन; शत्रु/दोष निवारण।",
+		shortDesc: t('pooja.services.durgaHavan.shortDesc', language),
 		content: `दुर्गा हवन नवरात्रि/अष्टमी/नवमी/शुक्रवार/পূর্ণिमा में श्रेष्ठ।
 -
 -सामग्री
@@ -242,9 +245,9 @@ const poojaServices = [
 -घर में शांति, सौभाग्य और शक्ति की वृद्धि।`
 	},
 	{
-		title: "लक्ष्मी–कुबेर हवन",
+		title: t('pooja.services.laxmiKuber.title', language),
 		image: laxmikub,
-		shortDesc: "धन-समृद्धि और स्थिरता हेतु लक्ष्मी-कुबेर हवन।",
+		shortDesc: t('pooja.services.laxmiKuber.shortDesc', language),
 		content: `धनतेरस/अक्षय तृतीया/दीपावली/पूर्णिमा/शुक्रवार में विशेष।
 
 महत्व
@@ -260,9 +263,9 @@ const poojaServices = [
 महालक्ष्मी: ॐ श्रीं महालक्ष्म्यै नमः ॥, कुबेर: ॐ यक्षाय कुबेराय... ॥, संयुक्त हवन: ॐ श्रीं ह्रीं क्लीं महालक्ष्म्यै कुबेराय नमः स्वाहा ॥`
 	},
 	{
-		title: "पितृदोष निवारण पूजा",
+		title: t('pooja.services.pitruDosh.title', language),
 		image: pitradosh,
-		shortDesc: "पितृ शांति और दोष निवारण हेतु वैदिक पूजन।",
+		shortDesc: t('pooja.services.pitruDosh.shortDesc', language),
 		content: `पितृ दोष कुंडली में दिखाई देने वाला दोष है जो प्रायः पितरों की अशांति/श्राद्ध-तर्पण के अभाव से उत्पन्न माना जाता है। इस दोष से जीवन में उतार-चढ़ाव, अवरोध और विविध कठिनाइयाँ बनी रह सकती हैं।
 +
 +पितृ कौन हैं
@@ -287,9 +290,9 @@ const poojaServices = [
 +- योग्य पंडित द्वारा शास्त्रोक्त विधि से संकल्प, तिथि-निश्चित कर्म और सात्त्विक आचरण।`
 	},
 	{
-		title: "मंगल दोष निवारण पूजा",
+		title: t('pooja.services.mangalDosh.title', language),
 		image: mangal,
-		shortDesc: "मांगलिक दोष शांति; वैवाहिक बाधा और कलह का निवारण।",
+		shortDesc: t('pooja.services.mangalDosh.shortDesc', language),
 	content: `मंगल दोष (मांगलिक दोष) तब बनता है जब जन्मकुंडली के 1, 4, 7 या 12वें भाव में मंगल स्थित हो। इससे भूमि/संपत्ति कार्यों में बाधा, ऋण-प्रश्न, वैवाहिक देरी और विवाहोपरांत कलह जैसी समस्याएँ बढ़ सकती हैं। वैदिक विधि से यह पूजा दोष के प्रभाव को शांत करने का उपाय है।
 +
 +मंगल दोष के प्रभाव
@@ -311,9 +314,9 @@ const poojaServices = [
 +- संपत्ति/भूमि कार्यों में सफलता और ऋण-समस्याओं में राहत`
 	},
 	{
-		title: "कुंभ विवाह",
+		title: t('pooja.services.kumbhVivah.title', language),
 		image: kumbh,
-		shortDesc: "मांगलिक/वैधव्य/विष योग शमन हेतु धार्मिक उपाय।",
+		shortDesc: t('pooja.services.kumbhVivah.shortDesc', language),
 		content: `घट/कुंभ विवाह से वैवाहिक दोष शमन का शास्त्रीय उपाय।
 -
 -संदर्भ
@@ -326,9 +329,9 @@ const poojaServices = [
 -दोष शमन, स्थायी/सुखी दाम्पत्य हेतु मंगलप्रद.`
 	},
 	{
-		title: "संतान गोपाल हवन",
+		title: t('pooja.services.santanGopal.title', language),
 		image: gopal,
-		shortDesc: "संतान प्राप्ति/सुरक्षा और मातृ-शक्ति हेतु विशेष अनुष्ठान।",
+		shortDesc: t('pooja.services.santanGopal.shortDesc', language),
 		content: `बाल गोपाल की कृपा हेतु जप-हवन।
 -
 -महत्व
@@ -338,9 +341,9 @@ const poojaServices = [
 -कृष्ण पूजन, मंत्र जप, हवन; माँ-शिशु की रक्षा/सुदृढ़ता हेतु प्रार्थना.`
 	},
 	{
-		title: "नारायण बलि संस्कार",
+		title: t('pooja.services.narayanBali.title', language),
 		image: narayanbali,
-		shortDesc: "प्रेतत्व को प्राप्त ज्ञात आत्माओं की सद्गति और मुक्ति।",
+		shortDesc: t('pooja.services.narayanBali.shortDesc', language),
 		content: `ज्ञात मृतक आत्मा की शांति/मुक्ति हेतु नारायण बलि।
 -
 -विधान
@@ -350,15 +353,15 @@ const poojaServices = [
 -घर-परिवार की शांति, अवरोध/รोग/कलह का शमन, सद्गति की प्रार्थना।`
 	},
 	{
-		title: "श्रीमद् भागवत कथा",
+		title: t('pooja.services.bhagwatKatha.title', language),
 		image: bhagwat,
-		shortDesc: "शास्त्रोक्त सप्ताहिक कथा-पाठ से आत्मिक कल्याण और पितृ-शांति।",
+		shortDesc: t('pooja.services.bhagwatKatha.shortDesc', language),
 		content: `भागवत सप्ताह श्रवण/पाठ से आत्मिक कल्याण, दोष निवारण और धर्म-प्रवर्धन। शास्त्रोक्त विधि, हवन/तर्पण सहित।`
 	},
 	{
-		title: "विवाह संस्कार",
+		title: t('pooja.services.vivahSanskar.title', language),
 		image: vivah,
-		shortDesc: "वैदिक विवाह विधि: कन्यादान, सप्तपदी, हवन और आशीर्वाद।",
+		shortDesc: t('pooja.services.vivahSanskar.shortDesc', language),
 		content: `वैदिक विवाह गृहस्थाश्रम में प्रवेश का महत्त्वपूर्ण संस्कार।
 -
 -मुख्य चरण
@@ -368,9 +371,9 @@ const poojaServices = [
 -अग्नि साक्षी प्रतिज्ञा, अर्धांग/अर्धांगिनी भाव, धर्म/जीवन की पूर्णता.`
 	},
 	{
-		title: "गृह प्रवेश पूजा",
+		title: t('pooja.services.grahPravesh.title', language),
 		image: grah,
-		shortDesc: "नए घर में शुद्धि, नवग्रह-वास्तु शांति और मंगल प्रवेश।",
+		shortDesc: t('pooja.services.grahPravesh.shortDesc', language),
 		content: `गृह प्रवेश पूजा (घर में पहली बार प्रवेश) का उद्देश्य नया घर पवित्र करना, नकारात्मकता दूर करना और परिवार के लिए सुख-समृद्धि, स्वास्थ्य और शांति का आशीर्वाद प्राप्त करना है।
 +
 +गृह प्रवेश पूजा के प्रकार
@@ -410,9 +413,9 @@ const poojaServices = [
 +- उसी दिन घर में रात्रि विश्राम करें; बाहर रात न बिताएं।`
 	},
 	{
-		title: "भगवान सत्यनारायण की पूजा",
+		title: t('pooja.services.satyaNarayan.title', language),
 		image: satya,
-		shortDesc: "शुभ कार्यों में सत्यनारायण व्रत-कथा, जप, आरती और प्रसाद।",
+		shortDesc: t('pooja.services.satyaNarayan.shortDesc', language),
 		content: `सत्यनारायण पूजा गृह-शांति/समृद्धि हेतु।
 -
 -विधि
@@ -422,9 +425,9 @@ const poojaServices = [
 -तुलसीदल अवश्य अर्पित करें, व्रती सात्त्विक रहे.`
 	},
 	{
-		title: "भगवान गणपति पूजा",
+		title: t('pooja.services.ganpatiPuja.title', language),
 		image: ganpati,
-		shortDesc: "विघ्नहर्ता गणेश की पूजा; दूर्वा, मोदक और आरती सहित।",
+		shortDesc: t('pooja.services.ganpatiPuja.shortDesc', language),
 		content: `गणेश जी प्रथम पूज्य; हर शुभ कार्य का आरंभ।
 -
 -विधि
@@ -437,9 +440,9 @@ const poojaServices = [
 -मंगलवार/चतुर्थी विशेष।`
 	},
 	{
-		title: "कालसर्प दोष निवारण पूजा",
+		title: t('pooja.services.kaalSarp.title', language),
 		image: sarp,
-		shortDesc: "राहु-केतु बंधनजन्य कालसर्प दोष शांति के उपाय।",
+		shortDesc: t('pooja.services.kaalSarp.shortDesc', language),
 		content: `जब सभी सात ग्रह राहु और केतु के बीच आ जाएँ, तब कालसर्प दोष बनता है। यह स्थिति पूर्वजन्म कर्मों के कारण प्रायः जन्मजात कष्टों/अवरोधों का कारक मानी जाती है और व्यक्ति के जीवन-पथ को लंबे समय तक प्रभावित कर सकती है।
 +
 +समय-अवधि और प्रभाव
@@ -462,9 +465,9 @@ const poojaServices = [
 +- दोष-प्रकार व ग्रहस्थितिनुसार विशेष मंत्र-जाप व हवन-विधि अपनाई जाती है।`
 	},
 	{
-		title: "गुरु चांडाल दोष निवारण पूजा",
+		title: t('pooja.services.guruChandal.title', language),
 		image: guru,
-		shortDesc: "गुरु-राहु संयोगजन्य दोष शमन; सदाचार और उन्नति हेतु।",
+		shortDesc: t('pooja.services.guruChandal.shortDesc', language),
 	content: `जब जन्मकुंडली में गुरु (बृहस्पति) और राहु का किसी भी प्रकार का संबंध बने, तब गुरु चांडाल दोष बनता है। राहु के प्रभाव में गुरु भी अशुभ फल देने लगते हैं, अतः इसे साढ़ेसाती, कालसर्प और मंगल दोष से भी अधिक अशुभ माना गया है। यह दोष अनैतिक प्रवृत्तियों, षड्यंत्र, विपरीतलिंगी आकर्षण, चारित्रिक पतन, चोरी/जुआ/सट्टा/अनैतिक धनार्जन, मद्यपान एवं हिंसक व्यवहार की प्रवृत्तियों को बढ़ा सकता है।
 +
 +विस्तृत पूजा विधि
@@ -481,9 +484,9 @@ const poojaServices = [
 +- नौकरी/करियर/जीवन-पथ की बाधाओं का निवारण।`
 	},
 	{
-		title: "रामायण सुन्दरकाण्ड हवन पूजा",
+		title: t('pooja.services.sundarkand.title', language),
 		image: sundar,
-		shortDesc: "रोग-भय-शत्रु निवारण हेतु पाठ व हवन; कार्य सिद्धि।",
+		shortDesc: t('pooja.services.sundarkand.shortDesc', language),
 		content: `सुन्दरकाण्ड भगवान हनुमानजी को समर्पित है। रामायण का यह अध्याय पाठ और हवन जीवन में आने वाली बाधाओं, रोग, ऋण, शत्रु और भय को दूर करता है। यह विशेष रूप से मंगलवार, शनिवार या संकट के समय करने पर अत्यधिक फलदायी माना गया है।
 
 महत्व
@@ -522,26 +525,29 @@ const poojaServices = [
 - सामूहिक रूप से किया गया सुन्दरकाण्ड हवन अत्यधिक शक्तिशाली और मंगलकारी होता है।`
 	},
 	{
-		title: "काल भैरव पूजा हवन",
+		title: t('pooja.services.kaalBhairav.title', language),
 		image: kaal,
-		shortDesc: "भय/शत्रु/अकाल-मृत्यु से रक्षा; कालाधिपति भैरव उपासना।",
+		shortDesc: t('pooja.services.kaalBhairav.shortDesc', language),
 		content: `काल भैरव भगवान शिव का उग्रतम स्वरूप हैं। उनकी पूजा से भय, शत्रु, रोग, अकाल मृत्यु और अदृश्य शक्तियों से रक्षा होती है। काल भैरव विशेष रूप से काल (समय) के अधिपति माने जाते हैं।\n\nमहत्व\n- आयु वृद्धि और अकाल मृत्यु से रक्षा।\n- शत्रु नाश और भय का निवारण।\n- तंत्र बाधा, भूत-प्रेत, ग्रहदोष से मुक्ति।\n- जीवन में साहस, आत्मविश्वास और शक्ति की प्राप्ति।\n\nआवश्यक सामग्री\n- काल भैरव का चित्र/प्रतिमा\n- गंगाजल, कलश, नारियल, आम्रपत्र\n- रुद्राक्ष की माला\n- पुष्पमाला, बेलपत्र, धूप, दीप, अगरबत्ती\n- काले तिल, उड़द, सरसों, काला वस्त्र\n- मदिरा या भोग (कुछ परंपराओं में)\n- हवन सामग्री, आम की लकड़ी, घी\n- फल, मिठाई, नैवेद्य\n\nपूजा विधि\n1) स्थान शुद्धि व संकल्प: स्थान को गंगाजल से शुद्ध करें। संकल्प लें — "मैं (अपना नाम) अपने परिवार की शांति, आरोग्य और समृद्धि के लिए भद्रकाली माता का पूजन एवं हवन कर रहा/रही हूँ।" और "मैं (अपना नाम) नवदुर्गा माता की स्थापना एवं पूजन कर परिवार की सुख-समृद्धि, स्वास्थ्य और रक्षा हेतु यह पूजा कर रहा/रही हूँ।"\n2) गणेश पूजन – विघ्नहर्ता गणेश जी का पूजन करें।\n3) नवग्रह पूजन – सभी नौ ग्रहों की विधिवत पूजा और आह्वान करें।\n4) कुलदेवता और पितृ पूजन – परिवार के कुलदेवता और पितरों का स्मरण करें।\n5) विशेष मूल नक्षत्र शांति पाठ – नक्षत्र शांति मंत्र का जाप किया जाता है। "ॐ मूल नक्षत्राधिपतये नमः" से मंत्रोच्चार कर आहुति दी जाती है।\n6) हवन – हवन कुंड में अग्नि प्रज्वलित कर प्रत्येक मंत्र पर आहुति दें। "ॐ मूल नक्षत्राधिपतये स्वाहा ॥" नवग्रह मंत्रों से भी आहुति दी जाती है।\n7) दक्षिणा और दान – ब्राह्मण को दक्षिणा, अन्न, वस्त्र और दान देना शुभ माना जाता है।\n8) आरती और प्रसाद: सभी नौ रूपों की आरती करें। नैवेद्य और प्रसाद वितरित करें।\n\nप्रमुख मंत्र\n- मूल नक्षत्र शांति मंत्र: ॐ मूल नक्षत्राधिपतये देवायै नमः स्वाहा ॥\n- नवग्रह मंत्र (संक्षेप में):\n  सूर्य: ॐ ह्रां ह्रीं ह्रौं सूर्याय नमः स्वाहा ॥\n  चन्द्र: ॐ श्रां श्रीं श्रौं चन्द्राय नमः स्वाहा ॥\n  मंगल: ॐ क्रां क्रीं क्रौं भौमाय नमः स्वाहा ॥\n  बुध: ॐ ब्रां ब्रीं ब्रौं बुधाय नमः स्वाहा ॥\n  गुरु: ॐ ग्रां ग्रीं ग्रौं गुरवे नमः स्वाहा ॥\n  शुक्र: ॐ द्रां द्रीं द्रौं शुक्राय नमः स्वाहा ॥\n  शनि: ॐ प्रां प्रीं प्रौं शनैश्चराय नमः स्वाहा ॥\n  राहु: ॐ भ्रां भ्रीं भ्रौं राहवे नमः स्वाहा ॥\n  केतु: ॐ स्रां स्रीं स्रौं केतवे नमः स्वाहा ॥\n\nविशेष बातें\n- यह पूजा शिशु के जन्म के 27वें दिन या नामकरण संस्कार के समय की जाती है।\n- यदि समय पर न हो सके तो किसी भी शुभ मुहूर्त (विशेषकर मूल नक्षत्र में) में यह की जा सकती है।\n- शांति के लिए दान, गौसेवा, अन्नदान और ब्राह्मण भोजन कराना बहुत शुभ माना जाता है।`
 	},
 	{
-		title: "नवदुर्गा स्थापना पूजा",
+		title: t('pooja.services.navdurgaStapna.title', language),
 		image: navdurga,
-		shortDesc: "नवरात्र प्रारंभ में नवदुर्गा की स्थापना और हवन।",
+		shortDesc: t('pooja.services.navdurgaStapna.shortDesc', language),
 		content: `नवदुर्गा स्थापना पूजा माँ शक्ति के नौ स्वरूपों (शैलपुत्री, ब्रह्मचारिणी, चंद्रघंटा, कुष्मांडा, स्कंदमाता, कात्यायनी, कालरात्रि, महागौरी और सिद्धिदात्री) को समर्पित होती है। इसे नवरात्रि प्रारंभ में या किसी विशेष शुभ मुहूर्त पर किया जाता है। इस पूजा से संपूर्ण परिवार पर सुख, समृद्धि और स्वास्थ्य की प्राप्ति होती है।\n\nमहत्व\n- जीवन में सुख, शांति और समृद्धि की प्राप्ति।\n- शत्रु बाधा और नकारात्मक शक्तियों से सुरक्षा।\n- मानसिक शक्ति, साहस और आत्मविश्वास में वृद्धि।\n- संकटों का नाश और जीवन में मंगल और उन्नति।\n\nआवश्यक सामग्री\n- नवदुर्गा की प्रतिमा/चित्र (या नौ कलश/संकल्प कलश)\n- कलश, गंगाजल, नारियल, आम्रपत्र\n- अक्षत, रोली, हल्दी, चंदन\n- पुष्प, दीपक, धूप, अगरबत्ती\n- लाल और पीले वस्त्र, चुनरी\n- फल, नैवेद्य, मिठाई, सुपारी\n- हवन कुंड, आम की लकड़ी, घी, हवन सामग्री\n- रुद्राक्ष माला या सप्तशती/देवी पाठ पुस्तक\n\nपूजन विधि (संक्षेप में)\n1. स्थान शुद्धि और संकल्प: गंगाजल से स्थान को शुद्ध करें। संकल्प लें: "मैं (अपना नाम) नवदुर्गा माता की स्थापना एवं पूजन कर परिवार की सुख-समृद्धि, स्वास्थ्य और रक्षा हेतु यह पूजा कर रहा/रही हूँ।" और "मैं (अपना नाम) इस स्थान पर गणपति स्थापना कर सभी कार्यों में सफलता और बाधा रहित जीवन हेतु पूजन कर रहा/रही हूँ।"\n2. गणेश पूजन: विघ्नहर्ता गणेश जी का पूजन करें।\n3. कलश/प्रतिमा स्थापना: नौ कलश में जल, आम्रपत्र और नारियल रखकर नवदुर्गा का आवाहन करें। प्रतिमा को लाल/पीले वस्त्र से सजाएँ।\n4. नवदुर्गा पूजन: प्रत्येक रूप (शैलपुत्री से सिद्धिदात्री तक) का पुष्प, अक्षत, चंदन और नैवेद्य अर्पित करें। प्रत्येक रूप पर मंत्र उच्चारण करें: "ॐ देवी (रूप नाम) नमः ॥" और "ॐ गं गणपतये नमः" (108 बार श्रेष्ठ)।\n5. हवन विधि: हवन कुंड में अग्नि प्रज्वलित करें। प्रत्येक रूप के लिए आहुति दें: घी, तिल, उड़द, समिधा। मुख्य हवन मंत्र: "ॐ ऐं ह्रीं क्लीं चामुण्डायै विच्चे स्वाहा ॥" और "ॐ दुं दुर्गायै स्वाहा"।\n6. आरती और प्रसाद: सभी नौ रूपों की आरती करें। नैवेद्य और प्रसाद वितरित करें।\n\nविशेष बातें\n- नवरात्रि के पहले दिन यह स्थापना पूजा सर्वोत्तम होती है।\n- यदि मूर्ति उपलब्ध न हो तो नवदुर्गा कलश स्थापना भी समान फलदायी है।\n- पूजा के दौरान सात्त्विक वातावरण और शुद्ध मन आवश्यक है।\n- इस पूजा के बाद नवदुर्गा पाठ, दुर्गा सप्तशती पाठ या आरती नियमित रूप से करें।`
 	}
 ];
 
 const PoojaPage = () => {
+    const { language } = useLanguage();
     const pageRef = useRef(null);
     const bannerRef = useRef(null);
     const introRef = useRef(null);
     const servicesRef = useRef(null);
     const benefitsRef = useRef(null);
     const [selectedService, setSelectedService] = useState(null);
+    
+    const poojaServices = getPoojaServices(language);
 
     useEffect(() => {
         if (typeof window !== 'undefined' && window.gsap && window.ScrollTrigger) {
@@ -614,13 +620,13 @@ const PoojaPage = () => {
             <header ref={bannerRef} className="relative w-full h-96 flex items-center justify-center text-center text-white overflow-hidden bg-cover bg-fixed bg-center" style={{ backgroundImage: `url(${poojaBannerUrl})` }}>
                 <div className="absolute inset-0 bg-gradient-to-b from-[#2E7D32]/70 to-[#1B5E20]/90"></div>
                 <div className="relative z-10 p-6">
-                    <h1 className="text-4xl md:text-6xl font-extrabold drop-shadow-lg leading-tight font-serif">पूजा सेवाएं</h1>
-                    <h2 className="text-xl md:text-3xl font-semibold mt-2 drop-shadow font-devanagari">आपके दरवाजे तक दिव्यता लाना</h2>
+                    <h1 className="text-4xl md:text-6xl font-extrabold drop-shadow-lg leading-tight font-serif">{t('pooja.title', language)}</h1>
+                    <h2 className="text-xl md:text-3xl font-semibold mt-2 drop-shadow font-devanagari">{t('pooja.subtitle', language)}</h2>
                     <p className="text-lg md:text-xl mt-4 max-w-2xl mx-auto font-sanskrit italic">
                         "यज्ञेन दानेन तपसा चैव स्वाध्यायेन च। योगेन चर्मणा चैव त्यागेन शान्तिराच्यते॥"
                     </p>
                     <a href="#pooja-services-list" className="mt-8 inline-block bg-gradient-to-r from-[#FFB300] to-[#FFC107] text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-[#FFC107] hover:to-[#FFD54F] transform hover:scale-105 transition-all duration-300 shadow-xl font-devanagari">
-                        हमारी सेवाएं देखें
+                        {t('pooja.viewServices', language)}
                     </a>
                 </div>
             </header>
@@ -628,9 +634,9 @@ const PoojaPage = () => {
             {/* Introduction to Pooja Services */}
             <section ref={introRef} className="py-16 md:py-20 bg-gradient-to-br from-[#FAFAFA] to-[#F5F5F5]">
                 <div className="container mx-auto px-4 text-center">
-                    <h3 className="intro-title text-3xl font-bold text-[#1B5E20] font-serif mb-6">पवित्र अनुष्ठानों के प्रति हमारी प्रतिबद्धता</h3>
+                    <h3 className="intro-title text-3xl font-bold text-[#1B5E20] font-serif mb-6">{t('pooja.commitment', language)}</h3>
                     <p className="intro-desc max-w-3xl mx-auto text-lg leading-relaxed text-[#424242] bg-white p-8 rounded-2xl shadow-lg font-devanagari">
-                        अर्चनम् में, हम अनुभवी और ज्ञानवर्धक पंडितों द्वारा किए गए विभिन्न पारंपरिक पूजा सेवाएं प्रदान करते हैं। हमारा लक्ष्य आपको अपनी आध्यात्मिक ओर से जोड़ने में मदद करना और आपके जीवन में शांति, समृद्धि और आशीर्वाद लाना है। सभी अनुष्ठान अत्यधिक भक्ति के साथ और प्रामाणिक वैदिक परंपराओं के अनुसार किए जाते हैं।
+                        {t('pooja.description', language)}
                     </p>
                 </div>
             </section>
@@ -639,18 +645,18 @@ const PoojaPage = () => {
             <section ref={servicesRef} id="pooja-services-list" className="py-16 md:py-20 bg-white">
                 <div className="container mx-auto px-4">
                     <div className="text-center mb-12">
-                        <h3 className="text-3xl font-bold text-[#1B5E20] font-serif mb-4">हमारी पूजा सेवाएं देखें</h3>
+                        <h3 className="text-3xl font-bold text-[#1B5E20] font-serif mb-4">{t('pooja.servicesTitle', language)}</h3>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 max-w-7xl mx-auto">
                         {poojaServices.map((service, index) => (
-                            <div key={index} className="pooja-card group p-6 rounded-2xl shadow-xl bg-white border border-gray-200 transform transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:border-[#FFB300]" onClick={() => setSelectedService(service)}>
-                                <div className="w-full h-56 mx-auto mb-4 overflow-hidden rounded-lg shadow-md transition-all duration-500 group-hover:scale-105 group-hover:saturate-150">
-                                    <img src={service.image} alt={service.title} className="w-full h-full object-cover" />
+                            <div key={index} className="pooja-card group p-8 rounded-2xl shadow-xl bg-white border border-gray-200 transform transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:border-[#FFB300]" onClick={() => setSelectedService(service)}>
+                                <div className="w-full h-72 sm:h-80 md:h-88 lg:h-96 mx-auto mb-6 overflow-hidden rounded-xl shadow-lg transition-all duration-500 group-hover:scale-105 group-hover:saturate-150">
+                                    <img src={service.image} alt={service.title} className="w-full h-full object-cover object-top" />
                                 </div>
-                                <h3 className="text-2xl font-bold text-[#1B5E20] mb-2 font-serif">{service.title}</h3>
-                                <p className="text-[#424242] italic mb-2 font-devanagari">{service.shortDesc}</p>
-                                <button className="mt-2 text-[#FFB300] font-semibold flex items-center justify-center w-full group-hover:text-[#FFC107] transition-colors font-devanagari" onClick={(e) => { e.stopPropagation(); setSelectedService(service); }}>
-                                    और जानें <ArrowRight className="ml-2 h-4 w-4" />
+                                <h3 className="text-2xl font-bold text-[#1B5E20] mb-3 font-serif">{service.title}</h3>
+                                <p className="text-[#424242] italic mb-4 font-devanagari leading-relaxed">{service.shortDesc}</p>
+                                <button className="mt-4 text-[#FFB300] font-semibold flex items-center justify-center w-full group-hover:text-[#FFC107] transition-colors font-devanagari" onClick={(e) => { e.stopPropagation(); setSelectedService(service); }}>
+                                    {t('common.learnMore', language)} <ArrowRight className="ml-2 h-4 w-4" />
                                 </button>
                             </div>
                         ))}
@@ -673,7 +679,7 @@ const PoojaPage = () => {
                             <pre className="whitespace-pre-wrap break-words text-[#424242] leading-7 font-devanagari">{selectedService.content}</pre>
                         </div>
                         <div className="mt-6 flex justify-end">
-                            <button className="bg-gradient-to-r from-[#FFB300] to-[#FFC107] text-white px-6 py-2 rounded-full font-semibold hover:from-[#FFC107] hover:to-[#FFD54F] transition-all" onClick={() => setSelectedService(null)}>बंद करें</button>
+                            <button className="bg-gradient-to-r from-[#FFB300] to-[#FFC107] text-white px-6 py-2 rounded-full font-semibold hover:from-[#FFC107] hover:to-[#FFD54F] transition-all" onClick={() => setSelectedService(null)}>{t('common.close', language)}</button>
                         </div>
                     </div>
                 </div>
@@ -683,36 +689,36 @@ const PoojaPage = () => {
             <section ref={benefitsRef} className="py-16 md:py-20 bg-gradient-to-br from-[#FAFAFA] to-[#F5F5F5]">
                 <div className="container mx-auto px-4">
                     <div className="text-center mb-12">
-                        <h3 className="text-3xl font-bold text-[#1B5E20] font-serif mb-4">हमारी सेवाएं क्यों चुनें?</h3>
+                        <h3 className="text-3xl font-bold text-[#1B5E20] font-serif mb-4">{t('pooja.whyChoose', language)}</h3>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                         <div className="benefit-card flex flex-col items-center text-center p-6 rounded-2xl shadow-lg bg-white transform transition-all duration-500 hover:scale-105 hover:shadow-xl">
                             <div className="w-16 h-16 rounded-full bg-[#FFB300]/20 flex items-center justify-center mb-4">
                                 <Award className="w-8 h-8 text-[#FFB300]" />
                             </div>
-                            <h4 className="text-xl font-bold text-[#1B5E20] mb-2 font-devanagari">प्रामाणिक अनुष्ठान</h4>
-                            <p className="text-[#424242] font-devanagari">प्रामाणिक वैदिक परंपराओं का पालन करते हुए अनुभवी पंडितों द्वारा किया गया</p>
+                            <h4 className="text-xl font-bold text-[#1B5E20] mb-2 font-devanagari">{t('pooja.authenticRituals', language)}</h4>
+                            <p className="text-[#424242] font-devanagari">{t('pooja.authenticDesc', language)}</p>
                         </div>
                         <div className="benefit-card flex flex-col items-center text-center p-6 rounded-2xl shadow-lg bg-white transform transition-all duration-500 hover:scale-105 hover:shadow-xl">
                             <div className="w-16 h-16 rounded-full bg-[#FFB300]/20 flex items-center justify-center mb-4">
                                 <Clock className="w-8 h-8 text-[#FFB300]" />
                             </div>
-                            <h4 className="text-xl font-bold text-[#1B5E20] mb-2 font-devanagari">समय की पाबंदी</h4>
-                            <p className="text-[#424242] font-devanagari">हम आपके समय का सम्मान करते हैं और अनुष्ठान निर्धारित समय पर करते हैं</p>
+                            <h4 className="text-xl font-bold text-[#1B5E20] mb-2 font-devanagari">{t('pooja.punctuality', language)}</h4>
+                            <p className="text-[#424242] font-devanagari">{t('pooja.punctualityDesc', language)}</p>
                         </div>
                         <div className="benefit-card flex flex-col items-center text-center p-6 rounded-2xl shadow-lg bg-white transform transition-all duration-500 hover:scale-105 hover:shadow-xl">
                             <div className="w-16 h-16 rounded-full bg-[#FFB300]/20 flex items-center justify-center mb-4">
                                 <Handshake className="w-8 h-8 text-[#FFB300]" />
                             </div>
-                            <h4 className="text-xl font-bold text-[#1B5E20] mb-2 font-devanagari">वैयक्तिकृत</h4>
-                            <p className="text-[#424242] font-devanagari">आपकी विशिष्ट आध्यात्मिक आवश्यकताओं को पूरा करने के लिए अनुकूलित सेवाएं</p>
+                            <h4 className="text-xl font-bold text-[#1B5E20] mb-2 font-devanagari">{t('pooja.personalized', language)}</h4>
+                            <p className="text-[#424242] font-devanagari">{t('pooja.personalizedDesc', language)}</p>
                         </div>
                         <div className="benefit-card flex flex-col items-center text-center p-6 rounded-2xl shadow-lg bg-white transform transition-all duration-500 hover:scale-105 hover:shadow-xl">
                             <div className="w-16 h-16 rounded-full bg-[#FFB300]/20 flex items-center justify-center mb-4">
                                 <Globe className="w-8 h-8 text-[#FFB300]" />
                             </div>
-                            <h4 className="text-xl font-bold text-[#1B5E20] mb-2 font-devanagari">पर्यावरण-अनुकूल</h4>
-                            <p className="text-[#424242] font-devanagari">हमारे सभी अनुष्ठानों में पर्यावरण-चेतना अभ्यास</p>
+                            <h4 className="text-xl font-bold text-[#1B5E20] mb-2 font-devanagari">{t('pooja.ecoFriendly', language)}</h4>
+                            <p className="text-[#424242] font-devanagari">{t('pooja.ecoFriendlyDesc', language)}</p>
                         </div>
                     </div>
                 </div>

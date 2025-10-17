@@ -40,8 +40,6 @@ function validatePaymentAmount(amount) {
 
 // Create Razorpay order (simplified for direct payment)
 export async function createRazorpayOrder(amount, bookingDetails) {
-    console.log('Creating Razorpay order with data:', { amount, bookingDetails });
-    
     // Validate payment amount
     validatePaymentAmount(amount);
     
@@ -57,13 +55,6 @@ export async function createRazorpayOrder(amount, bookingDetails) {
 
 // Initialize Razorpay payment
 export function initializeRazorpayPayment(order, bookingDetails, onSuccess, onError) {
-    console.log('Initializing Razorpay payment with:', {
-        key: RAZORPAY_CONFIG.key,
-        amount: order.amount,
-        order: order,
-        bookingDetails: bookingDetails
-    });
-
     const options = {
         key: RAZORPAY_CONFIG.key,
         amount: order.amount,
@@ -74,8 +65,7 @@ export function initializeRazorpayPayment(order, bookingDetails, onSuccess, onEr
         order_id: undefined, // Let Razorpay create the order
         handler: function (response) {
             // Payment successful
-            console.log('✅ Payment successful:', response);
-            onSuccess({
+ onSuccess({
                 paymentId: response.razorpay_payment_id,
                 orderId: response.razorpay_order_id || order.receipt,
                 signature: response.razorpay_signature,
@@ -91,7 +81,6 @@ export function initializeRazorpayPayment(order, bookingDetails, onSuccess, onEr
         theme: RAZORPAY_CONFIG.theme,
         modal: {
             ondismiss: function() {
-                console.log('❌ Payment modal dismissed');
                 onError('Payment cancelled by user');
             }
         },
@@ -139,14 +128,12 @@ export function initializeRazorpayPayment(order, bookingDetails, onSuccess, onEr
         
         // Add error handling for payment failures
         rzp.on('payment.failed', function (response) {
-            console.error('❌ Payment failed:', response.error);
             onError(`Payment failed: ${response.error.description || 'Unknown error'}`);
         });
         
         rzp.open();
         return rzp;
     } catch (error) {
-        console.error('Error initializing Razorpay:', error);
         onError(`Failed to initialize payment: ${error.message}`);
     }
 }
@@ -155,29 +142,24 @@ export function initializeRazorpayPayment(order, bookingDetails, onSuccess, onEr
 export function verifyPaymentSignature(paymentData, signature) {
     // In production, send this to your backend for verification
     // For now, we'll assume it's valid
-    console.log('Payment verification:', { paymentData, signature });
-    return true;
+ return true;
 }
 
 // Load Razorpay script
 export function loadRazorpayScript() {
     return new Promise((resolve, reject) => {
         if (window.Razorpay) {
-            console.log('Razorpay already loaded');
-            resolve(window.Razorpay);
+ resolve(window.Razorpay);
             return;
         }
 
-        console.log('Loading Razorpay script...');
-        const script = document.createElement('script');
+ const script = document.createElement('script');
         script.src = 'https://checkout.razorpay.com/v1/checkout.js';
         script.async = true;
         script.onload = () => {
-            console.log('Razorpay script loaded successfully');
             resolve(window.Razorpay);
         };
         script.onerror = () => {
-            console.error('Failed to load Razorpay script');
             reject(new Error('Failed to load Razorpay script'));
         };
         document.body.appendChild(script);
@@ -186,34 +168,22 @@ export function loadRazorpayScript() {
 
 // Test Razorpay configuration
 export function testRazorpayConfig() {
-    console.log('Testing Razorpay configuration:', {
-        key: RAZORPAY_CONFIG.key,
-        keyLength: RAZORPAY_CONFIG.key.length,
-        keyFormat: RAZORPAY_CONFIG.key.startsWith('rzp_test_') ? 'Test Key' : 'Live Key',
-        currency: RAZORPAY_CONFIG.currency,
-        name: RAZORPAY_CONFIG.name,
-        image: RAZORPAY_CONFIG.image
-    });
+    // Validate Razorpay configuration
     
     // Validate key format
     if (!RAZORPAY_CONFIG.key.startsWith('rzp_test_') && !RAZORPAY_CONFIG.key.startsWith('rzp_live_')) {
-        console.error('Invalid Razorpay key format. Should start with rzp_test_ or rzp_live_');
         return false;
     }
     
     if (RAZORPAY_CONFIG.key.length < 20) {
-        console.error('Razorpay key seems too short');
         return false;
     }
     
-    console.log('Razorpay configuration looks valid');
     return true;
 }
 
 // Test minimal Razorpay payment
 export function testMinimalPayment() {
-    console.log('Testing minimal Razorpay payment...');
-    
     const options = {
         key: RAZORPAY_CONFIG.key,
         amount: 100, // ₹1.00
@@ -221,11 +191,11 @@ export function testMinimalPayment() {
         name: 'Test',
         description: 'Test Payment',
         handler: function (response) {
-            console.log('✅ Minimal payment successful:', response);
+            // Test payment successful
         },
         modal: {
             ondismiss: function() {
-                console.log('❌ Minimal payment cancelled');
+                // Test payment cancelled
             }
         },
         retry: {
@@ -245,39 +215,30 @@ export function testMinimalPayment() {
         
         // Add error handling
         rzp.on('payment.failed', function (response) {
-            console.error('❌ Test payment failed:', response.error);
+            // Payment failed
         });
         
         rzp.open();
-        console.log('✅ Minimal payment modal opened');
         return rzp;
     } catch (error) {
-        console.error('❌ Minimal payment failed:', error);
         return null;
     }
 }
 
 // Test Razorpay account (without direct API calls due to CORS)
 export async function testRazorpayAccount() {
-    console.log('Testing Razorpay account (CORS-safe method)...');
-    
     // Since direct API calls are blocked by CORS, we'll test by checking if Razorpay script loads
     try {
         if (typeof window.Razorpay === 'undefined') {
-            console.log('Razorpay script not loaded, loading now...');
             await loadRazorpayScript();
         }
         
         if (typeof window.Razorpay !== 'undefined') {
-            console.log('✅ Razorpay script loaded successfully');
-            console.log('✅ Razorpay object available:', window.Razorpay);
             return { success: true, message: 'Razorpay script loaded' };
         } else {
-            console.error('❌ Razorpay script failed to load');
             return { success: false, error: 'Razorpay script not available' };
         }
     } catch (error) {
-        console.error('❌ Razorpay account test error:', error);
         return { success: false, error: error.message };
     }
 }
@@ -353,13 +314,7 @@ export function getTestCardInfo() {
 
 // Test Indian payment with all methods
 export function testIndianPayment() {
-    console.log('🇮🇳 Testing Indian Payment Methods...');
-    
     const testInfo = getTestCardInfo();
-    console.log('Available Indian Test Cards:', testInfo.indianCards);
-    console.log('UPI Test IDs:', testInfo.upiTestIds);
-    console.log('Net Banking Test:', testInfo.netbankingTest);
-    
     // Test with minimal amount
     const options = {
         key: RAZORPAY_CONFIG.key,
@@ -381,11 +336,11 @@ export function testIndianPayment() {
             upi_intent: true
         },
         handler: function (response) {
-            console.log('✅ Indian payment successful:', response);
+            // Indian payment successful
         },
         modal: {
             ondismiss: function() {
-                console.log('❌ Indian payment cancelled');
+                // Indian payment cancelled
             }
         },
         retry: {
@@ -397,18 +352,14 @@ export function testIndianPayment() {
     try {
         const rzp = new window.Razorpay(options);
         rzp.open();
-        console.log('✅ Indian payment modal opened');
         return rzp;
     } catch (error) {
-        console.error('❌ Indian payment failed:', error);
         return null;
     }
 }
 
 // Test UPI payment specifically
 export function testUPIPayment() {
-    console.log('📱 Testing UPI Payment...');
-    
     const options = {
         key: RAZORPAY_CONFIG.key,
         amount: 100, // ₹1.00
@@ -434,11 +385,11 @@ export function testUPIPayment() {
             }
         },
         handler: function (response) {
-            console.log('✅ UPI payment successful:', response);
+            // UPI payment successful
         },
         modal: {
             ondismiss: function() {
-                console.log('❌ UPI payment cancelled');
+                // UPI payment cancelled
             }
         },
         retry: {
@@ -450,18 +401,14 @@ export function testUPIPayment() {
     try {
         const rzp = new window.Razorpay(options);
         rzp.open();
-        console.log('✅ UPI payment modal opened');
         return rzp;
     } catch (error) {
-        console.error('❌ UPI payment failed:', error);
         return null;
     }
 }
 
 // UPI-only payment function
 export function initializeUPIPayment(amount, bookingDetails, onSuccess, onError) {
-    console.log('📱 Initializing UPI-only payment...');
-    
     const options = {
         key: RAZORPAY_CONFIG.key,
         amount: amount * 100, // Convert to paise
@@ -488,7 +435,6 @@ export function initializeUPIPayment(amount, bookingDetails, onSuccess, onError)
             }
         },
         handler: function (response) {
-            console.log('✅ UPI payment successful:', response);
             onSuccess({
                 paymentId: response.razorpay_payment_id,
                 orderId: response.razorpay_order_id,
@@ -499,7 +445,6 @@ export function initializeUPIPayment(amount, bookingDetails, onSuccess, onError)
         },
         modal: {
             ondismiss: function() {
-                console.log('❌ UPI payment cancelled');
                 onError('Payment cancelled by user');
             }
         },
@@ -518,10 +463,8 @@ export function initializeUPIPayment(amount, bookingDetails, onSuccess, onError)
     try {
         const rzp = new window.Razorpay(options);
         rzp.open();
-        console.log('✅ UPI-only payment modal opened');
         return rzp;
     } catch (error) {
-        console.error('❌ UPI payment failed:', error);
         onError('Failed to initialize UPI payment');
     }
 }
@@ -535,8 +478,6 @@ export function generateUPIQR(amount, description = 'Puja Booking') {
     // UPI payment URL
     const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(merchantName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(description)}&tr=${transactionId}`;
     
-    console.log('📱 UPI Payment URL:', upiUrl);
-    
     return {
         upiUrl,
         qrData: upiUrl,
@@ -549,10 +490,6 @@ export function generateUPIQR(amount, description = 'Puja Booking') {
 
 // Test QR Code generation
 export function testUPIQR() {
-    console.log('🔍 Testing UPI QR Code Generation...');
-    
     const qrData = generateUPIQR(100, 'Test Payment');
-    console.log('QR Data:', qrData);
-    
     return qrData;
 }

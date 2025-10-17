@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Phone, Mail, MapPin, Calendar, Clock, User, CheckCircle, ArrowLeft, ArrowRight, CreditCard, Shield, Loader2, QrCode, Smartphone, X } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { t } from '../utils/translations';
 import Navbar from '../components/Navbar';
-import { sendOtp, verifyOtp } from '../services/otp';
 import { createBooking, updateBooking } from '../services/bookingStore';
-import { loadRazorpayScript, createRazorpayOrder, initializeRazorpayPayment, BOOKING_STATUS, testRazorpayConfig, testMinimalPayment, testRazorpayAccount, testIndianPayment, getTestCardInfo, testUPIPayment, generateUPIQR, testUPIQR, initializeUPIPayment } from '../services/razorpay';
-import { sendBookingConfirmationEmail } from '../services/email';
+import { loadRazorpayScript, createRazorpayOrder, initializeRazorpayPayment, BOOKING_STATUS } from '../services/razorpay';
+import { sendWhatsAppMessage, sendCustomerConfirmation } from '../services/whatsapp';
 
 const Booking = () => {
     const { language } = useLanguage();
-    const [currentStep, setCurrentStep] = useState(1); // 1: Selection, 2: OTP, 3: Payment, 4: Success
+    const [currentStep, setCurrentStep] = useState(1); // 1: Selection, 2: Payment, 3: Success
     
     const handleNavigation = (e, page) => {
         e.preventDefault();
@@ -19,8 +19,6 @@ const Booking = () => {
         }
     };
     const [loading, setLoading] = useState(false);
-    const [otpSent, setOtpSent] = useState(false);
-    const [otpVerified, setOtpVerified] = useState(false);
     const [paymentSuccess, setPaymentSuccess] = useState(false);
     const [bookingToken, setBookingToken] = useState(null);
     
@@ -33,12 +31,16 @@ const Booking = () => {
         time: '',
         address: '',
         specialRequests: '',
-        otp: '',
-        amount: 0
+        amount: 0,
+        // Birth details for Kundali service
+        dateOfBirth: '',
+        birthTime: '',
+        birthPeriod: 'AM',
+        birthPlace: ''
     });
 
     const [errors, setErrors] = useState({});
-    const [showTestInfo, setShowTestInfo] = useState(false);
+
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('card');
     const [showQRGenerator, setShowQRGenerator] = useState(false);
 
@@ -108,171 +110,94 @@ const Booking = () => {
         }
         
         if (!formData.serviceType) {
-            newErrors.serviceType = language === 'hi' ? 'सेवा का प्रकार चुनें' : 'Select service type';
+            newErrors.serviceType = t('booking.serviceRequired', language);
         }
         
         if (!formData.date) {
-            newErrors.date = language === 'hi' ? 'तारीख चुनें' : 'Select date';
+            newErrors.date = t('booking.dateRequired', language);
         }
         
         if (!formData.time) {
-            newErrors.time = language === 'hi' ? 'समय चुनें' : 'Select time';
+            newErrors.time = t('booking.timeRequired', language);
         }
         
         if (!formData.address.trim()) {
-            newErrors.address = language === 'hi' ? 'पता आवश्यक है' : 'Address is required';
+            newErrors.address = t('booking.addressRequired', language);
+        }
+
+        // Birth details validation for Kundali service
+        if (formData.serviceType === 'astrology-kundali') {
+            if (!formData.dateOfBirth) {
+                newErrors.dateOfBirth = language === 'hi' ? 'जन्म तिथि आवश्यक है' : 'Date of birth is required';
+            } else {
+                const birthDate = new Date(formData.dateOfBirth);
+                const today = new Date();
+                if (birthDate > today) {
+                    newErrors.dateOfBirth = language === 'hi' ? 'जन्म तिथि भविष्य में नहीं हो सकती' : 'Birth date cannot be in future';
+                }
+            }
+            
+            if (!formData.birthTime) {
+                newErrors.birthTime = language === 'hi' ? 'जन्म समय आवश्यक है' : 'Birth time is required';
+            }
+            
+            if (!formData.birthPlace.trim()) {
+                newErrors.birthPlace = language === 'hi' ? 'जन्म स्थान आवश्यक है' : 'Birth place is required';
+            } else if (formData.birthPlace.trim().length < 2) {
+                newErrors.birthPlace = language === 'hi' ? 'वैध जन्म स्थान दर्ज करें' : 'Enter valid birth place';
+            }
         }
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSendOtp = async () => {
+    const handleProceedToPayment = async () => {
         if (!validateStep1()) return;
         
         setLoading(true);
         try {
-            const result = await sendOtp(formData.email, language);
-            if (result.success) {
-                setOtpSent(true);
-                setCurrentStep(2);
-                // Set amount based on selected service
-                const selectedServiceLocal = services.find(s => s.value === formData.serviceType);
-                setFormData(prev => ({ ...prev, amount: selectedServiceLocal?.price || 0 }));
-                
-                // Show success message
-                console.log(`✅ OTP sent via ${result.provider} to ${formData.email}`);
-            } else {
-                setErrors({ email: language === 'hi' ? 'OTP भेजने में त्रुटि' : 'Error sending OTP' });
-            }
+            // Set amount based on selected service
+            const selectedServiceLocal = services.find(s => s.value === formData.serviceType);
+            const updatedFormData = { ...formData, amount: selectedServiceLocal?.price || 0 };
+            setFormData(updatedFormData);
+            
+            // Create booking record directly (no OTP verification needed)
+            const booking = createBooking({
+                ...updatedFormData,
+                status: BOOKING_STATUS.PAYMENT_PENDING,
+                createdAt: new Date().toISOString()
+            });
+            setBookingToken(booking.token);
+            
+            // Proceed to payment step
+            setCurrentStep(2);
+
         } catch (error) {
-            console.error('OTP sending error:', error);
-            setErrors({ email: error.message || (language === 'hi' ? 'OTP भेजने में त्रुटि' : 'Error sending OTP') });
+            setErrors({ general: language === 'hi' ? 'बुकिंग बनाने में त्रुटि' : 'Error creating booking' });
         } finally {
             setLoading(false);
         }
     };
 
-    const handleVerifyOtp = async () => {
-        if (!formData.otp.trim()) {
-            setErrors({ otp: language === 'hi' ? 'OTP दर्ज करें' : 'Enter OTP' });
-            return;
-        }
-
-        setLoading(true);
-        try {
-            const result = await verifyOtp(formData.email, formData.otp);
-            if (result.success) {
-                setOtpVerified(true);
-                setCurrentStep(3);
-                // Create booking record
-                const booking = createBooking({
-                    ...formData,
-                    status: BOOKING_STATUS.OTP_VERIFIED,
-                    createdAt: new Date().toISOString()
-                });
-                setBookingToken(booking.token);
-            } else {
-                setErrors({ otp: result.error || (language === 'hi' ? 'गलत OTP' : 'Invalid OTP') });
-            }
-        } catch (error) {
-            setErrors({ otp: language === 'hi' ? 'OTP सत्यापन में त्रुटि' : 'OTP verification error' });
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // Test function for debugging Razorpay
-    const testRazorpay = async () => {
-        console.log('🧪 Testing Razorpay...');
-        
-        // Test 1: Configuration
-        testRazorpayConfig();
-        
-        // Test 2: Account API
-        const accountTest = await testRazorpayAccount();
-        console.log('Account test result:', accountTest);
-        
-        // Test 3: Minimal payment
-        if (accountTest.success) {
-            testMinimalPayment();
-        } else {
-            console.error('❌ Account test failed, skipping payment test');
-        }
-    };
-
-    // Test payment function
-    const handleTestPayment = async () => {
-        console.log('🧪 Testing Indian Payment...');
-        setLoading(true);
-        try {
-            // Load Razorpay script
-            await loadRazorpayScript();
-            
-            // Test Indian payment
-            testIndianPayment();
-            
-            // Show test card info
-            const testInfo = getTestCardInfo();
-            console.log('🇮🇳 Test Card Info:', testInfo);
-            setShowTestInfo(true);
-            
-        } catch (error) {
-            console.error('❌ Test payment failed:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // Test UPI payment function
-    const handleTestUPI = async () => {
-        console.log('📱 Testing UPI Payment...');
-        setLoading(true);
-        try {
-            await loadRazorpayScript();
-            
-            // Use UPI-only payment for testing
-            initializeUPIPayment(
-                1, // ₹1 test amount
-                {
-                    pujaType: 'Test Puja',
-                    name: 'Test User',
-                    bookingId: `TEST${Date.now()}`
-                },
-                (response) => {
-                    console.log('✅ UPI test payment successful:', response);
-                    setLoading(false);
-                },
-                (error) => {
-                    console.error('❌ UPI test payment failed:', error);
-                    setLoading(false);
-                }
-            );
-        } catch (error) {
-            console.error('❌ UPI test failed:', error);
-            setLoading(false);
-        }
-    };
+    // Test functions removed for production
 
     // Generate UPI QR code
     const handleGenerateQR = () => {
         const qrData = generateUPIQR(formData.amount, `${selectedPuja?.label} - ${formData.name}`);
-        console.log('📱 Generated UPI QR:', qrData);
+
         setShowQRGenerator(true);
     };
 
     // Handle payment method selection
     const handlePaymentMethodChange = (method) => {
         setSelectedPaymentMethod(method);
-        console.log('💳 Payment method selected:', method);
+
     };
 
     const handlePayment = async () => {
         setLoading(true);
         try {
-            // Test Razorpay configuration first
-            testRazorpayConfig();
-            
             // Load Razorpay script
             await loadRazorpayScript();
             
@@ -291,7 +216,7 @@ const Booking = () => {
                     async (paymentResponse) => {
                         // Payment successful
                         setPaymentSuccess(true);
-                        setCurrentStep(4);
+                        setCurrentStep(3);
                         
                         // Update booking with payment details
                         const updatedBooking = updateBooking(bookingToken, {
@@ -303,23 +228,40 @@ const Booking = () => {
                             paidAt: new Date().toISOString()
                         });
                         
-                        // Send booking confirmation email to host
+                        // Send WhatsApp notification to admin
                         try {
-                            await sendBookingConfirmationEmail({
+ const whatsappResult = await sendWhatsAppMessage({
                                 ...formData,
-                                bookingId: updatedBooking?.bookingId || `BK${Date.now()}`,
-                                paymentStatus: 'Payment Successful',
-                                amount: formData.amount
+                                bookingId: updatedBooking.bookingId,
+                                paymentId: paymentResponse.paymentId,
+                                amount: paymentResponse.amount
                             });
-                            console.log('✅ Booking confirmation email sent to host');
-                        } catch (emailError) {
-                            console.error('❌ Failed to send booking confirmation email:', emailError);
+                            
+                            if (whatsappResult.success) {
+                            } else {
+                            }
+                            
+                            // Optional: Send confirmation to customer
+                            const customerConfirmation = await sendCustomerConfirmation(
+                                formData.phone, 
+                                {
+                                    ...formData,
+                                    bookingId: updatedBooking.bookingId,
+                                    amount: paymentResponse.amount
+                                }
+                            );
+                            
+                            if (customerConfirmation.success) {
+                            } else {
+                            }
+                            
+                        } catch (whatsappError) {
+                            // Don't fail the booking if WhatsApp fails
                         }
                         
                         setLoading(false);
                     },
                     (error) => {
-                        console.error('❌ UPI payment failed:', error);
                         setLoading(false);
                     }
                 );
@@ -331,7 +273,7 @@ const Booking = () => {
                     async (paymentResponse) => {
                         // Payment successful
                         setPaymentSuccess(true);
-                        setCurrentStep(4);
+                        setCurrentStep(3);
                         
                         // Update booking with payment details
                         const updatedBooking = updateBooking(bookingToken, {
@@ -343,32 +285,47 @@ const Booking = () => {
                             paidAt: new Date().toISOString()
                         });
                         
-                        // Send booking confirmation email to host
+                        // Send WhatsApp notification to admin
                         try {
-                            await sendBookingConfirmationEmail({
+ const whatsappResult = await sendWhatsAppMessage({
                                 ...formData,
-                                bookingId: updatedBooking?.bookingId || `BK${Date.now()}`,
-                                paymentStatus: 'Payment Successful',
-                                amount: formData.amount
+                                bookingId: updatedBooking.bookingId,
+                                paymentId: paymentResponse.paymentId,
+                                amount: paymentResponse.amount
                             });
-                            console.log('✅ Booking confirmation email sent to host');
-                        } catch (emailError) {
-                            console.error('❌ Failed to send booking confirmation email:', emailError);
-                            // Don't fail the booking if email fails
+                            
+                            if (whatsappResult.success) {
+                            } else {
+                            }
+                            
+                            // Optional: Send confirmation to customer
+                            const customerConfirmation = await sendCustomerConfirmation(
+                                formData.phone, 
+                                {
+                                    ...formData,
+                                    bookingId: updatedBooking.bookingId,
+                                    amount: paymentResponse.amount
+                                }
+                            );
+                            
+                            if (customerConfirmation.success) {
+                            } else {
+                            }
+                            
+                        } catch (whatsappError) {
+                            // Don't fail the booking if WhatsApp fails
                         }
                         
                         setLoading(false);
                     },
                     (error) => {
                         // Payment failed or cancelled
-                        console.error('Payment error:', error);
                         setErrors({ payment: language === 'hi' ? 'भुगतान में त्रुटि' : 'Payment error' });
                         setLoading(false);
                     }
                 );
             }
         } catch (error) {
-            console.error('Payment initialization error:', error);
             setErrors({ payment: language === 'hi' ? 'भुगतान में त्रुटि' : 'Payment error' });
             setLoading(false);
         }
@@ -382,12 +339,14 @@ const Booking = () => {
 
     const selectedService = services.find(s => s.value === formData.serviceType);
 
+    // WhatsApp test function removed for production
+
     // Load Razorpay script on component mount
     useEffect(() => {
         loadRazorpayScript().catch(console.error);
     }, []);
 
-    if (currentStep === 4) {
+    if (currentStep === 3) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-[#1B5E20] to-[#2E7D32]">
                 <Navbar onNavigate={handleNavigation} />
@@ -395,14 +354,19 @@ const Booking = () => {
                     <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
                         <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
                         <h2 className="text-2xl font-bold text-[#1B5E20] mb-4">
-                            {language === 'hi' ? 'बुकिंग सफल!' : 'Booking Successful!'}
+                            {t('booking.successTitle', language)}
                         </h2>
                         <p className="text-gray-600 mb-4">
                             {language === 'hi' 
-                                ? `आपकी ${selectedPuja?.label} सफलतापूर्वक बुक हो गई है।` 
-                                : `Your ${selectedPuja?.label} has been successfully booked.`
+                                ? `आपकी सेवा सफलतापूर्वक बुक हो गई है।` 
+                                : `Your service has been successfully booked.`
                             }
                         </p>
+                        {formData.serviceType && (
+                            <p className="text-sm text-gray-500 mb-4">
+                                {language === 'hi' ? 'सेवा:' : 'Service:'} {formData.serviceType}
+                            </p>
+                        )}
                         <p className="text-gray-600 mb-6">
                             {language === 'hi' 
                                 ? 'हमारी टीम जल्द ही आपसे संपर्क करेगी।' 
@@ -410,7 +374,7 @@ const Booking = () => {
                             }
                         </p>
                         <button 
-                            onClick={() => window.history.pushState({}, '', '/')}
+                            onClick={handleNavigation}
                             className="bg-[#FFB300] text-white px-6 py-3 rounded-full font-semibold hover:bg-[#FFC107] transition-colors"
                         >
                             {language === 'hi' ? 'वापस होम' : 'Back to Home'}
@@ -429,14 +393,14 @@ const Booking = () => {
                     {/* Progress Steps */}
                     <div className="flex justify-center mb-8">
                         <div className="flex items-center space-x-4">
-                            {[1, 2, 3].map((step) => (
+                            {[1, 2].map((step) => (
                                 <div key={step} className="flex items-center">
                                     <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ${
                                         currentStep >= step ? 'bg-[#FFB300]' : 'bg-white/20'
                                     }`}>
                                         {step}
                                     </div>
-                                    {step < 3 && (
+                                    {step < 2 && (
                                         <div className={`w-16 h-1 mx-2 ${
                                             currentStep > step ? 'bg-[#FFB300]' : 'bg-white/20'
                                         }`} />
@@ -448,14 +412,12 @@ const Booking = () => {
 
                     <div className="text-center mb-12">
                         <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4 font-serif">
-                            {currentStep === 1 && (language === 'hi' ? 'सेवा बुकिंग' : 'Book a Service')}
-                            {currentStep === 2 && (language === 'hi' ? 'ईमेल OTP सत्यापन' : 'Email OTP Verification')}
-                            {currentStep === 3 && (language === 'hi' ? 'भुगतान' : 'Payment')}
+                            {currentStep === 1 && t('booking.title', language)}
+                            {currentStep === 2 && t('booking.paymentTitle', language)}
                         </h1>
                         <p className="text-xl text-white/90 font-devanagari">
-                            {currentStep === 1 && (language === 'hi' ? 'अपनी आध्यात्मिक यात्रा शुरू करें' : 'Begin your spiritual journey')}
-                            {currentStep === 2 && (language === 'hi' ? 'अपने ईमेल में OTP दर्ज करें' : 'Enter OTP from your email')}
-                            {currentStep === 3 && (language === 'hi' ? 'सुरक्षित भुगतान करें' : 'Make secure payment')}
+                            {currentStep === 1 && t('booking.subtitle', language)}
+                            {currentStep === 2 && t('booking.paymentSubtitle', language)}
                         </p>
                     </div>
 
@@ -484,7 +446,7 @@ const Booking = () => {
                                 </>
                             )}
                             
-                            {(currentStep === 2 || currentStep === 3) && (
+                            {currentStep === 2 && (
                                 <>
                                     <h3 className="text-2xl font-bold mb-6 font-serif">
                                         {language === 'hi' ? 'बुकिंग सारांश' : 'Booking Summary'}
@@ -506,6 +468,34 @@ const Booking = () => {
                                             <span>{language === 'hi' ? 'सेवा:' : 'Service:'}</span>
                                             <span className="font-semibold">{selectedService?.label}</span>
                                         </div>
+                                        
+                                        {/* Birth Details for Kundali Service */}
+                                        {formData.serviceType === 'astrology-kundali' && formData.dateOfBirth && (
+                                            <>
+                                                <div className="border-t border-white/20 pt-4">
+                                                    <h4 className="text-sm font-semibold text-[#FFB300] mb-2">
+                                                        {language === 'hi' ? 'जन्म विवरण:' : 'Birth Details:'}
+                                                    </h4>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span>{language === 'hi' ? 'जन्म तिथि:' : 'Birth Date:'}</span>
+                                                    <span className="font-semibold">{formData.dateOfBirth}</span>
+                                                </div>
+                                                {formData.birthTime && (
+                                                    <div className="flex justify-between">
+                                                        <span>{language === 'hi' ? 'जन्म समय:' : 'Birth Time:'}</span>
+                                                        <span className="font-semibold">{formData.birthTime} {formData.birthPeriod}</span>
+                                                    </div>
+                                                )}
+                                                {formData.birthPlace && (
+                                                    <div className="flex justify-between">
+                                                        <span>{language === 'hi' ? 'जन्म स्थान:' : 'Birth Place:'}</span>
+                                                        <span className="font-semibold">{formData.birthPlace}</span>
+                                                    </div>
+                                                )}
+                                            </>
+                                        )}
+                                        
                                         <div className="flex justify-between">
                                             <span>{language === 'hi' ? 'तारीख:' : 'Date:'}</span>
                                             <span className="font-semibold">{formData.date}</span>
@@ -529,7 +519,7 @@ const Booking = () => {
                                 <form className="space-y-6">
                                     <div>
                                         <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                            {language === 'hi' ? 'नाम' : 'Name'} *
+                                            {t('booking.name', language)} *
                                         </label>
                                         <input
                                             type="text"
@@ -546,7 +536,7 @@ const Booking = () => {
 
                                     <div>
                                         <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                            {language === 'hi' ? 'फोन नंबर' : 'Phone Number'} *
+                                            {t('booking.phone', language)} *
                                         </label>
                                         <input
                                             type="tel"
@@ -563,7 +553,7 @@ const Booking = () => {
 
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                        {language === 'hi' ? 'ईमेल' : 'Email'} *
+                                        {t('booking.email', language)} *
                                     </label>
                                     <input
                                         type="email"
@@ -581,7 +571,7 @@ const Booking = () => {
 
                                     <div>
                                         <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                            {language === 'hi' ? 'सेवा का प्रकार' : 'Type of Service'} *
+                                            {t('booking.serviceType', language)} *
                                         </label>
                                         <select
                                             name="serviceType"
@@ -604,10 +594,99 @@ const Booking = () => {
                                         )}
                                     </div>
 
+                                    {/* Birth Details for Kundali Service */}
+                                    {formData.serviceType === 'astrology-kundali' && (
+                                        <div className="bg-orange-50 border border-orange-200 rounded-lg p-6 space-y-4">
+                                            <h4 className="text-lg font-semibold text-orange-800 mb-4 flex items-center">
+                                                <span className="mr-2">🕉️</span>
+                                                {language === 'hi' ? 'जन्म विवरण (कुंडली के लिए आवश्यक)' : 'Birth Details (Required for Kundali)'}
+                                            </h4>
+                                            
+                                            <div>
+                                                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                                    {language === 'hi' ? 'जन्म तिथि' : 'Date of Birth'} *
+                                                </label>
+                                                <input
+                                                    type="date"
+                                                    name="dateOfBirth"
+                                                    value={formData.dateOfBirth}
+                                                    onChange={handleChange}
+                                                    max={new Date().toISOString().split('T')[0]}
+                                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#FFB300] focus:border-transparent ${
+                                                        errors.dateOfBirth ? 'border-red-500' : 'border-gray-300'
+                                                    }`}
+                                                />
+                                                {errors.dateOfBirth && <p className="text-red-500 text-sm mt-1">{errors.dateOfBirth}</p>}
+                                            </div>
+
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                                        {language === 'hi' ? 'जन्म समय' : 'Birth Time'} *
+                                                    </label>
+                                                    <input
+                                                        type="time"
+                                                        name="birthTime"
+                                                        value={formData.birthTime}
+                                                        onChange={handleChange}
+                                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#FFB300] focus:border-transparent ${
+                                                            errors.birthTime ? 'border-red-500' : 'border-gray-300'
+                                                        }`}
+                                                    />
+                                                    {errors.birthTime && <p className="text-red-500 text-sm mt-1">{errors.birthTime}</p>}
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                                        {language === 'hi' ? 'AM/PM' : 'AM/PM'} *
+                                                    </label>
+                                                    <select
+                                                        name="birthPeriod"
+                                                        value={formData.birthPeriod}
+                                                        onChange={handleChange}
+                                                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#FFB300] focus:border-transparent ${
+                                                            errors.birthPeriod ? 'border-red-500' : 'border-gray-300'
+                                                        }`}
+                                                    >
+                                                        <option value="AM">AM</option>
+                                                        <option value="PM">PM</option>
+                                                    </select>
+                                                    {errors.birthPeriod && <p className="text-red-500 text-sm mt-1">{errors.birthPeriod}</p>}
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                                    {language === 'hi' ? 'जन्म स्थान' : 'Birth Place'} *
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    name="birthPlace"
+                                                    value={formData.birthPlace}
+                                                    onChange={handleChange}
+                                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#FFB300] focus:border-transparent ${
+                                                        errors.birthPlace ? 'border-red-500' : 'border-gray-300'
+                                                    }`}
+                                                    placeholder={language === 'hi' ? 'जैसे: मुंबई, महाराष्ट्र' : 'e.g: Mumbai, Maharashtra'}
+                                                />
+                                                {errors.birthPlace && <p className="text-red-500 text-sm mt-1">{errors.birthPlace}</p>}
+                                            </div>
+
+                                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
+                                                <p className="text-sm text-blue-800">
+                                                    <strong>{language === 'hi' ? 'महत्वपूर्ण:' : 'Important:'}</strong>
+                                                    {language === 'hi' 
+                                                        ? ' सटीक कुंडली विश्लेषण के लिए जन्म का सही समय और स्थान बहुत आवश्यक है।'
+                                                        : ' Accurate birth time and place are essential for precise Kundali analysis.'
+                                                    }
+                                                </p>
+                                            </div>
+                                        </div>
+                                    )}
+
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
                                             <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                                {language === 'hi' ? 'तारीख' : 'Date'} *
+                                                {t('booking.date', language)} *
                                             </label>
                                             <input
                                                 type="date"
@@ -623,7 +702,7 @@ const Booking = () => {
                                         </div>
                                         <div>
                                             <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                                {language === 'hi' ? 'समय' : 'Time'} *
+                                                {t('booking.time', language)} *
                                             </label>
                                             <input
                                                 type="time"
@@ -640,7 +719,7 @@ const Booking = () => {
 
                                     <div>
                                         <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                            {language === 'hi' ? 'पता' : 'Address'} *
+                                            {t('booking.address', language)} *
                                         </label>
                                         <textarea
                                             name="address"
@@ -657,7 +736,7 @@ const Booking = () => {
 
                                     <div>
                                         <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                            {language === 'hi' ? 'विशेष अनुरोध' : 'Special Requests'}
+                                            {t('booking.specialRequests', language)}
                                         </label>
                                         <textarea
                                             name="specialRequests"
@@ -671,18 +750,18 @@ const Booking = () => {
 
                                         <button
                                             type="button"
-                                            onClick={handleSendOtp}
+                                            onClick={handleProceedToPayment}
                                             disabled={loading}
                                             className="w-full bg-gradient-to-r from-[#FFB300] to-[#FFC107] text-white py-4 rounded-lg font-bold text-lg hover:from-[#FFC107] hover:to-[#FFD54F] transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                                         >
                                             {loading ? (
                                                 <>
                                                     <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                                                    {language === 'hi' ? 'ईमेल OTP भेजा जा रहा है...' : 'Sending Email OTP...'}
+                                                    {language === 'hi' ? 'भुगतान के लिए आगे बढ़ रहे हैं...' : 'Proceeding to Payment...'}
                                                 </>
                                             ) : (
                                                 <>
-                                                    {language === 'hi' ? 'ईमेल OTP भेजें' : 'Send Email OTP'}
+                                                    {language === 'hi' ? 'भुगतान के लिए आगे बढ़ें' : 'Proceed to Payment'}
                                                     <ArrowRight className="w-5 h-5 ml-2" />
                                                 </>
                                             )}
@@ -693,77 +772,11 @@ const Booking = () => {
                             {currentStep === 2 && (
                                 <div className="space-y-6">
                                     <div className="text-center">
-                                        <div className="w-16 h-16 bg-[#FFB300] rounded-full flex items-center justify-center mx-auto mb-4">
-                                            <Mail className="w-8 h-8 text-white" />
-                                        </div>
-                                        <h3 className="text-xl font-bold text-gray-800 mb-2">
-                                            {language === 'hi' ? 'ईमेल OTP भेजा गया' : 'Email OTP Sent'}
-                                        </h3>
-                                        <p className="text-gray-600">
-                                            {language === 'hi' 
-                                                ? `हमने आपके ईमेल ${formData.email} पर OTP भेजा है` 
-                                                : `We've sent an OTP to ${formData.email}`
-                                            }
-                                        </p>
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                            {language === 'hi' ? 'OTP दर्ज करें' : 'Enter OTP'} *
-                                        </label>
-                                        <input
-                                            type="text"
-                                            name="otp"
-                                            value={formData.otp}
-                                            onChange={handleChange}
-                                            maxLength="6"
-                                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#FFB300] focus:border-transparent text-center text-2xl tracking-widest ${
-                                                errors.otp ? 'border-red-500' : 'border-gray-300'
-                                            }`}
-                                            placeholder="000000"
-                                        />
-                                        {errors.otp && <p className="text-red-500 text-sm mt-1">{errors.otp}</p>}
-                                    </div>
-
-                                    <div className="flex space-x-4">
-                                        <button
-                                            type="button"
-                                            onClick={goBack}
-                                            className="flex-1 bg-gray-500 text-white py-3 rounded-lg font-semibold hover:bg-gray-600 transition-colors flex items-center justify-center"
-                                        >
-                                            <ArrowLeft className="w-5 h-5 mr-2" />
-                                            {language === 'hi' ? 'वापस' : 'Back'}
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={handleVerifyOtp}
-                                            disabled={loading}
-                                            className="flex-1 bg-gradient-to-r from-[#FFB300] to-[#FFC107] text-white py-3 rounded-lg font-semibold hover:from-[#FFC107] hover:to-[#FFD54F] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                                        >
-                                            {loading ? (
-                                                <>
-                                                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                                                    {language === 'hi' ? 'सत्यापित...' : 'Verifying...'}
-                                                </>
-                                            ) : (
-                                                <>
-                                                    {language === 'hi' ? 'सत्यापित करें' : 'Verify'}
-                                                    <ArrowRight className="w-5 h-5 ml-2" />
-                                                </>
-                                            )}
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-
-                            {currentStep === 3 && (
-                                <div className="space-y-6">
-                                    <div className="text-center">
                                         <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
                                             <CheckCircle className="w-8 h-8 text-white" />
                                         </div>
                                         <h3 className="text-xl font-bold text-gray-800 mb-2">
-                                            {language === 'hi' ? 'OTP सत्यापित' : 'OTP Verified'}
+                                            {language === 'hi' ? 'सुरक्षित भुगतान' : 'Secure Payment'}
                                         </h3>
                                         <p className="text-gray-600">
                                             {language === 'hi' ? 'अब सुरक्षित भुगतान करें' : 'Now make secure payment'}
@@ -825,16 +838,7 @@ const Booking = () => {
                                     {/* UPI Options */}
                                     {selectedPaymentMethod === 'upi' && (
                                         <div className="space-y-3 mb-4">
-                                            <button
-                                                type="button"
-                                                onClick={handleTestUPI}
-                                                disabled={loading}
-                                                className="w-full bg-green-500 text-white py-2 rounded-lg font-semibold hover:bg-green-600 transition-colors disabled:opacity-50 flex items-center justify-center space-x-2"
-                                            >
-                                                <Smartphone className="w-4 h-4" />
-                                                <span>{loading ? 'Testing...' : 'Test UPI Payment'}</span>
-                                            </button>
-                                            
+
                                             <div className="grid grid-cols-2 gap-3">
                                                 <button
                                                     type="button"
@@ -844,29 +848,6 @@ const Booking = () => {
                                                     <QrCode className="w-4 h-4" />
                                                     <span>Generate QR</span>
                                                 </button>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Test Button for Debugging */}
-                                    <button
-                                        type="button"
-                                        onClick={handleTestPayment}
-                                        disabled={loading}
-                                        className="w-full bg-blue-500 text-white py-2 rounded-lg font-semibold hover:bg-blue-600 transition-colors mb-4 disabled:opacity-50"
-                                    >
-                                        {loading ? '🧪 Testing...' : '🧪 Test All Payment Methods (₹1)'}
-                                    </button>
-
-                                    {/* Test Card Information */}
-                                    {showTestInfo && (
-                                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-                                            <h4 className="font-semibold text-yellow-800 mb-2">🇮🇳 Test Information:</h4>
-                                            <div className="text-sm text-yellow-700 space-y-1">
-                                                <div><strong>Card:</strong> 4111 1111 1111 1111</div>
-                                                <div><strong>Expiry:</strong> 12/25</div>
-                                                <div><strong>CVV:</strong> 123</div>
-                                                <div><strong>UPI:</strong> test@razorpay</div>
                                             </div>
                                         </div>
                                     )}
@@ -905,7 +886,6 @@ const Booking = () => {
                     </div>
                 </div>
             </div>
-
 
             {/* QR Generator Modal */}
             {showQRGenerator && (
@@ -948,8 +928,6 @@ const Booking = () => {
                                     onClick={() => {
                                         // Generate actual QR code
                                         const qrData = generateUPIQR(formData.amount, `${selectedService?.label} - ${formData.name}`);
-                                        console.log('Generated QR:', qrData);
-                                        alert('QR Code generated! Check console for details.');
                                     }}
                                     className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-600 transition-colors"
                                 >

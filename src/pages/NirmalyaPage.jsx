@@ -1,9 +1,12 @@
 import React, { useEffect, useRef } from 'react';
 import { Truck, Droplets, Camera, Leaf, ArrowRight, CheckCircle } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
+import { t } from '../utils/translations';
 
 const nirmalyaBannerUrl = 'https://static.vecteezy.com/system/resources/previews/070/419/820/non_2x/diya-lamp-floating-in-water-a-festive-celebration-free-photo.jpg';
 
 const NirmalyaPage = () => {
+    const { language } = useLanguage();
     const pageRef = useRef(null);
     const bannerRef = useRef(null);
     const whatIsNirmalyaRef = useRef(null);
@@ -97,13 +100,13 @@ const NirmalyaPage = () => {
                 </div>
                 
                 <div className="relative z-10 p-6">
-                    <h1 className="text-4xl md:text-6xl font-extrabold drop-shadow-lg leading-tight font-serif">निर्माल्य सेवा</h1>
-                    <h2 className="text-xl md:text-3xl font-semibold mt-2 drop-shadow font-devanagari">आपकी पूजा अवशेषों का पवित्र विसर्जन</h2>
+                    <h1 className="text-4xl md:text-6xl font-extrabold drop-shadow-lg leading-tight font-serif">{t('nirmalya.title', language)}</h1>
+                    <h2 className="text-xl md:text-3xl font-semibold mt-2 drop-shadow font-devanagari">{t('nirmalya.subtitle', language)}</h2>
                     <p className="text-lg md:text-xl mt-4 max-w-2xl mx-auto font-sanskrit italic">
                         "गंगे च यमुने चैव गोदावरि सरस्वति। नर्मदे सिन्धु कावेरि जलेऽस्मिन् सन्तिष्ठ मे॥"
                     </p>
                     <a href="#book-nirmalya" className="mt-8 inline-block bg-gradient-to-r from-[#FFB300] to-[#FFC107] text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-[#FFC107] hover:to-[#FFD54F] transform hover:scale-105 transition-all duration-300 shadow-xl font-devanagari">
-                        अभी बुक करें
+{t('home.bookNow', language)}
                     </a>
                 </div>
             </header>
@@ -113,10 +116,10 @@ const NirmalyaPage = () => {
                 <div className="container mx-auto px-4 text-center">
                     <div className="lotus-icon flex items-center justify-center mb-6">
                         <div className="text-5xl text-[#FFB300] mr-4 transform transition-transform duration-500 hover:scale-110">🪷</div>
-                        <h3 className="nirmalya-title text-3xl font-bold text-[#1B5E20] font-serif">निर्माल्य क्या है?</h3>
+                        <h3 className="nirmalya-title text-3xl font-bold text-[#1B5E20] font-serif">{t('nirmalya.whatIs', language)}</h3>
                     </div>
                     <p className="nirmalya-desc max-w-3xl mx-auto text-lg leading-relaxed text-[#424242] bg-gradient-to-r from-[#FAFAFA] to-[#F5F5F5] p-6 rounded-xl shadow-md font-devanagari">
-                        पूजा, आरती और यज्ञ के बाद, फूल, मालाएं, पत्ते, पवित्र धागे, सिंदूर और भस्म जैसी पवित्र चीजें बचती हैं। इन्हें निर्माल्य के रूप में जाना जाता है। इन्हें अनुचित तरीके से निपटाना अशुभ माना जाता है। हमारी सेवा इनका वैदिक मंत्रों के साथ पवित्र गंगा नदी में पवित्र विसर्जन सुनिश्चित करती है।
+                        {t('nirmalya.description', language)}
                     </p>
                 </div>
             </section>
@@ -125,32 +128,32 @@ const NirmalyaPage = () => {
             <section ref={serviceRef} className="py-16 md:py-20 bg-gradient-to-br from-[#F5F5F5] to-[#EEEEEE]">
                 <div className="container mx-auto px-4">
                     <div className="text-center mb-12">
-                        <h3 className="text-3xl font-bold text-[#1B5E20] font-serif mb-4">हमारी सेवा</h3>
+                        <h3 className="text-3xl font-bold text-[#1B5E20] font-serif mb-4">{t('nirmalya.ourService', language)}</h3>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                         <div className="service-card flex flex-col items-center text-center p-8 rounded-2xl shadow-xl bg-white transform transition-all duration-500 hover:scale-105 hover:shadow-2xl">
                             <span className="service-icon text-4xl mb-4 text-[#FFB300] p-4 bg-[#FAFAFA] rounded-full">
                                 <Truck size={48} />
                             </span>
-                            <p className="text-lg font-medium text-[#424242] font-devanagari">आपके घर/दुकान से निर्माल्य का संग्रह</p>
+                            <p className="text-lg font-medium text-[#424242] font-devanagari">{t('nirmalya.collection', language)}</p>
                         </div>
                         <div className="service-card flex flex-col items-center text-center p-8 rounded-2xl shadow-xl bg-white transform transition-all duration-500 hover:scale-105 hover:shadow-2xl">
                             <span className="service-icon text-4xl mb-4 text-[#FFB300] p-4 bg-[#FAFAFA] rounded-full">
                                 <Droplets size={48} />
                             </span>
-                            <p className="text-lg font-medium text-[#424242] font-devanagari">वैदिक मंत्रों के साथ पवित्र गंगा में विसर्जन</p>
+                            <p className="text-lg font-medium text-[#424242] font-devanagari">{t('nirmalya.disposal', language)}</p>
                         </div>
                         <div className="service-card flex flex-col items-center text-center p-8 rounded-2xl shadow-xl bg-white transform transition-all duration-500 hover:scale-105 hover:shadow-2xl">
                             <span className="service-icon text-4xl mb-4 text-[#FFB300] p-4 bg-[#FAFAFA] rounded-full">
                                 <Camera size={48} />
                             </span>
-                            <p className="text-lg font-medium text-[#424242] font-devanagari">विसर्जन का प्रमाण (फोटो/वीडियो) आपको भेजा जाएगा</p>
+                            <p className="text-lg font-medium text-[#424242] font-devanagari">{t('nirmalya.proof', language)}</p>
                         </div>
                         <div className="service-card flex flex-col items-center text-center p-8 rounded-2xl shadow-xl bg-white transform transition-all duration-500 hover:scale-105 hover:shadow-2xl">
                             <span className="service-icon text-4xl mb-4 text-[#FFB300] p-4 bg-[#FAFAFA] rounded-full">
                                 <Leaf size={48} />
                             </span>
-                            <p className="text-lg font-medium text-[#424242] font-devanagari">धार्मिक परंपरा और पर्यावरण संरक्षण का पालन</p>
+                            <p className="text-lg font-medium text-[#424242] font-devanagari">{t('nirmalya.ecoFriendly', language)}</p>
                         </div>
                     </div>
                 </div>
@@ -159,25 +162,25 @@ const NirmalyaPage = () => {
             {/* How to Book Section */}
             <section ref={bookingRef} id="book-nirmalya" className="py-16 md:py-20 bg-white">
                 <div className="container mx-auto px-4 text-center">
-                    <h3 className="text-3xl font-bold text-[#1B5E20] font-serif mb-8">सेवा कैसे बुक करें?</h3>
+                    <h3 className="text-3xl font-bold text-[#1B5E20] font-serif mb-8">{t('nirmalya.howToBook', language)}</h3>
                     <div className="flex flex-col md:flex-row items-center justify-center md:space-x-12 space-y-8 md:space-y-0">
                         <div className="booking-step flex flex-col items-center p-6 bg-gradient-to-br from-[#FAFAFA] to-[#F5F5F5] rounded-2xl shadow-lg transform transition-transform duration-300 hover:scale-105">
                             <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#1B5E20] to-[#2E7D32] text-white text-2xl font-bold flex items-center justify-center mb-4 shadow-md">1</div>
-                            <p className="text-lg font-medium text-[#424242] font-devanagari">हमारी वेबसाइट पर बुकिंग फॉर्म भरें</p>
+                            <p className="text-lg font-medium text-[#424242] font-devanagari">{t('nirmalya.step1', language)}</p>
                         </div>
                         <div className="text-3xl text-[#FFB300] hidden md:block animate-pulse">→</div>
                         <div className="booking-step flex flex-col items-center p-6 bg-gradient-to-br from-[#FAFAFA] to-[#F5F5F5] rounded-2xl shadow-lg transform transition-transform duration-300 hover:scale-105">
                             <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#1B5E20] to-[#2E7D32] text-white text-2xl font-bold flex items-center justify-center mb-4 shadow-md">2</div>
-                            <p className="text-lg font-medium text-[#424242] font-devanagari">हमारी टीम आपके पते से निर्माल्य एकत्र करेगी</p>
+                            <p className="text-lg font-medium text-[#424242] font-devanagari">{t('nirmalya.step2', language)}</p>
                         </div>
                         <div className="text-3xl text-[#FFB300] hidden md:block animate-pulse">→</div>
                         <div className="booking-step flex flex-col items-center p-6 bg-gradient-to-br from-[#FAFAFA] to-[#F5F5F5] rounded-2xl shadow-lg transform transition-transform duration-300 hover:scale-105">
                             <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#1B5E20] to-[#2E7D32] text-white text-2xl font-bold flex items-center justify-center mb-4 shadow-md">3</div>
-                            <p className="text-lg font-medium text-[#424242] font-devanagari">पवित्र विसर्जन + प्रमाण (फोटो/वीडियो)</p>
+                            <p className="text-lg font-medium text-[#424242] font-devanagari">{t('nirmalya.step3', language)}</p>
                         </div>
                     </div>
                     <button className="mt-12 bg-gradient-to-r from-[#FFB300] to-[#FFC107] text-white px-10 py-4 rounded-full text-lg font-semibold hover:from-[#FFC107] hover:to-[#FFD54F] transform hover:scale-105 transition-all duration-300 shadow-xl font-devanagari">
-                        निर्माल्य सेवा बुक करें
+{t('nirmalya.bookService', language)}
                     </button>
                 </div>
             </section>
@@ -185,26 +188,26 @@ const NirmalyaPage = () => {
             {/* Packages Section */}
             <section ref={packagesRef} className="py-16 md:py-20 bg-gradient-to-br from-[#FAFAFA] to-[#F5F5F5]">
                 <div className="container mx-auto px-4 text-center">
-                    <h3 className="text-3xl font-bold text-[#1B5E20] font-serif mb-8">पैकेज और मूल्य निर्धारण</h3>
+                    <h3 className="text-3xl font-bold text-[#1B5E20] font-serif mb-8">{t('nirmalya.packagesTitle', language)}</h3>
                     <div className="max-w-3xl mx-auto overflow-hidden rounded-2xl shadow-xl">
                         <table className="w-full text-left border-collapse table-auto">
                             <thead>
                                 <tr className="bg-gradient-to-r from-[#1B5E20] to-[#2E7D32] text-white">
-                                    <th className="p-4 text-lg font-semibold border-b-2 border-gray-300 font-devanagari">पैकेज</th>
-                                    <th className="p-4 text-lg font-semibold border-b-2 border-gray-300 font-devanagari">विवरण</th>
-                                    <th className="p-4 text-lg font-semibold border-b-2 border-gray-300 font-devanagari">सेवा शुल्क</th>
+                                    <th className="p-4 text-lg font-semibold border-b-2 border-gray-300 font-devanagari">{t('nirmalya.package', language)}</th>
+                                    <th className="p-4 text-lg font-semibold border-b-2 border-gray-300 font-devanagari">{t('nirmalya.details', language)}</th>
+                                    <th className="p-4 text-lg font-semibold border-b-2 border-gray-300 font-devanagari">{t('nirmalya.serviceFee', language)}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr className="package-row hover:bg-[#F5F5F5] transition-colors border-b border-gray-200">
-                                    <td className="p-4 text-lg font-medium font-devanagari">मासिक सेवा</td>
-                                    <td className="p-4 text-lg font-devanagari">महीना ₹251 - अधिकतम 1.5 किलो तक</td>
-                                    <td className="p-4 text-lg font-bold text-[#1B5E20]">₹251/महीना</td>
+                                    <td className="p-4 text-lg font-medium font-devanagari">{t('nirmalya.monthlyService', language)}</td>
+                                    <td className="p-4 text-lg font-devanagari">{t('nirmalya.monthlyDetails', language)}</td>
+                                    <td className="p-4 text-lg font-bold text-[#1B5E20]">{t('nirmalya.monthlyPrice', language)}</td>
                                 </tr>
                                 <tr className="package-row hover:bg-[#F5F5F5] transition-colors">
-                                    <td className="p-4 text-lg font-medium font-devanagari">4 महीने का पैकेज</td>
-                                    <td className="p-4 text-lg font-devanagari">4 महीने की सेवा (बचत ₹253)</td>
-                                    <td className="p-4 text-lg font-bold text-[#1B5E20]">₹751</td>
+                                    <td className="p-4 text-lg font-medium font-devanagari">{t('nirmalya.fourMonthPackage', language)}</td>
+                                    <td className="p-4 text-lg font-devanagari">{t('nirmalya.fourMonthDetails', language)}</td>
+                                    <td className="p-4 text-lg font-bold text-[#1B5E20]">{t('nirmalya.fourMonthPrice', language)}</td>
                                 </tr>
                             </tbody>
                         </table>

@@ -20,6 +20,13 @@ function readEnv(key, windowFallbackKey) {
 export const RAZORPAY_KEY_ID = readEnv('VITE_RAZORPAY_KEY_ID', '__RAZORPAY_KEY_ID__');
 export const CURRENCY = readEnv('VITE_CURRENCY', '__CURRENCY__') || 'INR';
 
+// SendPulse Configuration
+export const SENDPULSE_USER_ID = readEnv('VITE_SENDPULSE_USER_ID', '__SENDPULSE_USER_ID__');
+export const SENDPULSE_SECRET = readEnv('VITE_SENDPULSE_SECRET', '__SENDPULSE_SECRET__');
+export const SENDPULSE_FROM_EMAIL = readEnv('VITE_SENDPULSE_FROM_EMAIL', '__SENDPULSE_FROM_EMAIL__');
+export const SENDPULSE_FROM_NAME = readEnv('VITE_SENDPULSE_FROM_NAME', '__SENDPULSE_FROM_NAME__') || 'अर्चनम्';
+
+// Legacy EmailJS (keeping for backward compatibility)
 export const EMAILJS_SERVICE_ID = readEnv('VITE_EMAILJS_SERVICE_ID', '__EMAILJS_SERVICE_ID__');
 export const EMAILJS_PUBLIC_KEY = readEnv('VITE_EMAILJS_PUBLIC_KEY', '__EMAILJS_PUBLIC_KEY__') || readEnv('VITE_EMAILJSS_PUBLIC_KEY', '__EMAILJSS_PUBLIC_KEY__');
 export const EMAILJS_TEMPLATE_ID = readEnv('VITE_EMAILJS_TEMPLATE_ID', '__EMAILJS_TEMPLATE_ID__');

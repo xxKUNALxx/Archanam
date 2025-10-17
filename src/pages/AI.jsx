@@ -49,7 +49,7 @@ export function AiPujaSuggestion() {
 
       setStep('action');
     } catch (e) {
-      const msg = (e?.message || '').includes('Missing VITE_GEMINI_API_KEY') ? t('ai.apiKeyError', language) : (e?.message || t('ai.generalError', language));
+      const msg = (e?.message || '').includes('Missing GEMINI_API_KEY') ? t('ai.apiKeyError', language) : (e?.message || t('ai.generalError', language));
       setError(msg);
     } finally {
       setLoading(false);
@@ -234,7 +234,7 @@ export function AiMantraAssistant() {
       const text = await generateText({ prompt });
       setResult(text);
     } catch (e) {
-      const msg = (e?.message || '').includes('Missing VITE_GEMINI_API_KEY') ? t('ai.apiKeyError', language) : (e?.message || t('ai.unknownError', language));
+      const msg = (e?.message || '').includes('Missing GEMINI_API_KEY') ? t('ai.apiKeyError', language) : (e?.message || t('ai.unknownError', language));
       setResult(t('ai.errorPrefix', language) + msg);
     } finally { setLoading(false); }
   };
@@ -345,7 +345,7 @@ export function AiSankalpGenerator() {
         setOutput(cleanedText);
       }
     } catch (e) {
-      const msg = (e?.message || '').includes('Missing VITE_GEMINI_API_KEY') ? t('ai.apiKeyError', language) : (e?.message || t('ai.unknownError', language));
+      const msg = (e?.message || '').includes('Missing GEMINI_API_KEY') ? t('ai.apiKeyError', language) : (e?.message || t('ai.unknownError', language));
       setOutput(t('ai.errorPrefix', language) + msg);
     } finally { setLoading(false); }
   };
@@ -434,7 +434,7 @@ export function AiPanchangWidget() {
         setData(text);
       }
     } catch (e) {
-      const msg = (e?.message || '').includes('Missing VITE_GEMINI_API_KEY') ? t('ai.apiKeyError', language) : (e?.message || t('ai.unknownError', language));
+      const msg = (e?.message || '').includes('Missing GEMINI_API_KEY') ? t('ai.apiKeyError', language) : (e?.message || t('ai.unknownError', language));
       setData(t('ai.errorPrefix', language) + msg);
     }
     finally { setLoading(false); }

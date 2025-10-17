@@ -2,13 +2,13 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Direct environment variable access with fallback
-const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+const apiKey = import.meta.env.GEMINI_API_KEY;
 let client;
 
 function getClient() {
   if (!client) {
     if (!apiKey) {
-      throw new Error("❌ Missing VITE_GEMINI_API_KEY environment variable");
+      throw new Error("❌ Missing GEMINI_API_KEY environment variable");
     }
     if (!apiKey.startsWith("AIza")) {
       throw new Error("❌ Invalid API key format. Should start with 'AIza'");

@@ -2,7 +2,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Direct environment variable access with fallback
-const apiKey = import.meta.env.GEMINI_API_KEY;
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSyAr5EQXzbHJGTerZL1A1C44pGSNaAwfdrI';
 let client;
 
 function getClient() {

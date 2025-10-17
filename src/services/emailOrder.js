@@ -1,12 +1,11 @@
 // EmailJS service for admin order confirmation only
 import emailjs from '@emailjs/browser';
-import {
-    EMAILJS_SERVICE_ID,
-    EMAILJS_PUBLIC_KEY,
-    EMAILJS_BOOKING_TEMPLATE_ID,
-    EMAIL_FROM_NAME,
-    EMAIL_FROM_ADDRESS
-} from '../config/env.js';
+// Temporary fix - direct env access
+const EMAILJS_SERVICE_ID = import.meta.env.EMAILJS_SERVICE_ID || 'service_y8omb6d';
+const EMAILJS_PUBLIC_KEY = import.meta.env.EMAILJS_PUBLIC_KEY || '2kX9-9LSRIJM5TiOd';
+const EMAILJS_BOOKING_TEMPLATE_ID = import.meta.env.EMAILJS_BOOKING_TEMPLATE_ID || 'template_snx5d52';
+const EMAIL_FROM_NAME = import.meta.env.EMAIL_FROM_NAME || 'अर्चनम्';
+const EMAIL_FROM_ADDRESS = import.meta.env.EMAIL_FROM_ADDRESS || 'danteonhunt@gmail.com';
 
 const EMAILJS_CONFIG = {
     serviceId: EMAILJS_SERVICE_ID,

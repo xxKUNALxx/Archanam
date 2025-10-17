@@ -1,5 +1,9 @@
 // Razorpay payment integration service
-import { RAZORPAY_KEY_ID, CURRENCY, MERCHANT_NAME, UPI_ID } from '../config/env.js';
+// Temporary fix - hardcoded values to resolve build error
+const RAZORPAY_KEY_ID = 'rzp_test_ROwpcjCWzDBLkC';
+const CURRENCY = 'INR';
+const MERCHANT_NAME = 'अर्चनम्';
+const UPI_ID = 'test@razorpay';
 
 // Razorpay configuration
 const RAZORPAY_CONFIG = {

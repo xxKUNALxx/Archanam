@@ -149,11 +149,11 @@ export function verifyPaymentSignature(paymentData, signature) {
 export function loadRazorpayScript() {
     return new Promise((resolve, reject) => {
         if (window.Razorpay) {
- resolve(window.Razorpay);
+            resolve(window.Razorpay);
             return;
         }
 
- const script = document.createElement('script');
+        const script = document.createElement('script');
         script.src = 'https://checkout.razorpay.com/v1/checkout.js';
         script.async = true;
         script.onload = () => {

@@ -6,6 +6,7 @@ import Navbar from '../components/Navbar';
 import { createBooking, updateBooking } from '../services/bookingStore';
 import { loadRazorpayScript, createRazorpayOrder, initializeRazorpayPayment, BOOKING_STATUS } from '../services/razorpay';
 import { sendWhatsAppMessage, sendCustomerConfirmation } from '../services/whatsapp';
+import { logRazorpayDiagnostic } from '../utils/razorpayDebug';
 
 const Booking = () => {
     const { language } = useLanguage();
@@ -878,6 +879,15 @@ const Booking = () => {
                                                     {language === 'hi' ? 'भुगतान करें' : 'Pay Now'}
                                                 </>
                                             )}
+                                        </button>
+                                        
+                                        {/* Debug Button - Remove in production */}
+                                        <button
+                                            type="button"
+                                            onClick={() => logRazorpayDiagnostic()}
+                                            className="mt-2 w-full bg-red-500 text-white py-2 px-4 rounded-lg text-sm hover:bg-red-600 transition-colors"
+                                        >
+                                            🔍 Debug Razorpay (Check Console)
                                         </button>
                                     </div>
                                 </div>

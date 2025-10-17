@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { generateText } from '../services/gemini.js';
 import { useLanguage } from '../context/LanguageContext';
 import { t } from '../utils/translations';
+import { formatAIResponse, aiResponseStyles } from '../utils/aiResponseFormatter';
 
 export function AiPujaSuggestion() {
   const { language } = useLanguage();
@@ -63,8 +64,60 @@ export function AiPujaSuggestion() {
     setAiResponse({});
   };
 
-  const handleInfoRequest = () => {
-    setStep('info');
+  const handleInfoRequest = async () => {
+    setLoading(true);
+    setError('');
+    
+    try {
+      // Extract the puja name from the AI response for detailed vidhi
+      const pujaName = aiResponse.pujaSuggestion ? 
+        aiResponse.pujaSuggestion.split('\n')[0].replace(/[*:]/g, '').trim() : 
+        userInput;
+      
+      const vidhiPrompt = `भूमिका: आप एक अनुभवी वैदिक आचार्य हैं।
+पूजा: "${pujaName}"
+
+कृपया इस पूजा की संपूर्ण विधि बताएं:
+
+(a) पूजा विधि (Step by Step):
+- तैयारी और स्थान की शुद्धता
+- पूजा की शुरुआत कैसे करें
+- मंत्र और आरती
+- समापन विधि
+
+(b) मंत्र और श्लोक:
+- मुख्य मंत्र (संस्कृत में)
+- आरती के श्लोक
+- संकल्प मंत्र
+
+(c) समय और दिशा:
+- उत्तम समय (मुहूर्त)
+- दिशा का महत्व
+- कितनी देर तक करें
+
+(d) विशेष नियम:
+- क्या करें और क्या न करें
+- व्रत के नियम (यदि कोई हो)
+- फल प्राप्ति के लिए विशेष बातें
+
+संक्षिप्त और स्पष्ट भाषा में उत्तर दें।`;
+
+      const vidhiResponse = await generateText({ prompt: vidhiPrompt });
+      
+      setAiResponse({
+        ...aiResponse,
+        vidhiDetails: vidhiResponse || 'विधि की जानकारी प्राप्त नहीं हो सकी।'
+      });
+      
+      setStep('info');
+    } catch (e) {
+      const msg = (e?.message || '').includes('Missing GEMINI_API_KEY') ? 
+        t('ai.apiKeyError', language) : 
+        (e?.message || t('ai.generalError', language));
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const resetFlow = () => {
@@ -74,8 +127,11 @@ export function AiPujaSuggestion() {
     setError('');
   };
 
+
+
   return (
     <div className="p-6 rounded-2xl shadow-lg bg-white border border-gray-200">
+      <style dangerouslySetInnerHTML={{ __html: aiResponseStyles }} />
       <h3 className="text-2xl font-bold text-[#1B5E20] mb-4 font-serif">🕉 {t('ai.title', language)}</h3>
 
       {step === 'greeting' && (
@@ -106,19 +162,14 @@ export function AiPujaSuggestion() {
 
       {step === 'action' && aiResponse.pujaSuggestion && (
         <div className="space-y-4">
-          <div className="bg-[#F5F5F5] p-4 rounded-lg">
-            <h4 className="font-bold text-[#1B5E20] mb-2">पूजा सुझाव:</h4>
-            <p className="font-devanagari">{aiResponse.pujaSuggestion}</p>
-          </div>
-
-          <div className="bg-[#F5F5F5] p-4 rounded-lg">
-            <h4 className="font-bold text-[#1B5E20] mb-2">संक्षिप्त कारण:</h4>
-            <p className="font-devanagari">{aiResponse.reason}</p>
-          </div>
-
-          <div className="bg-[#F5F5F5] p-4 rounded-lg">
-            <h4 className="font-bold text-[#1B5E20] mb-2">पूजा सामग्री:</h4>
-            <p className="font-devanagari">{aiResponse.materials}</p>
+          <div className="bg-white border border-gray-200 rounded-lg p-4 max-h-96 overflow-y-auto shadow-sm">
+            <h4 className="font-bold text-[#1B5E20] mb-4 text-lg border-b border-gray-200 pb-2">🙏 AI पूजा सुझाव</h4>
+            <div 
+              className="font-devanagari text-sm leading-relaxed ai-response-content"
+              dangerouslySetInnerHTML={{ 
+                __html: formatAIResponse(aiResponse.pujaSuggestion) 
+              }}
+            />
           </div>
 
           <div className="flex gap-3 mt-6">
@@ -190,15 +241,23 @@ export function AiPujaSuggestion() {
 
       {step === 'info' && (
         <div className="space-y-4">
-          <h4 className="text-xl font-bold text-[#1B5E20]">पूजा विधि और मंत्र</h4>
-          <div className="bg-[#F5F5F5] p-4 rounded-lg">
-            <p className="font-devanagari">
-              <strong>विधि:</strong> सुबह स्नान करके पूजा स्थल को साफ करें। दीपक जलाकर पूजा आरंभ करें।<br />
-              <strong>मंत्र:</strong> "ॐ गणेशाय नमः" (गणेश पूजा के लिए)<br />
-              <strong>समय:</strong> सुबह 6-8 बजे या शाम 6-8 बजे<br />
-              <strong>दिन:</strong> मंगलवार या गुरुवार शुभ माने जाते हैं
-            </p>
-          </div>
+          <h4 className="text-xl font-bold text-[#1B5E20]">📖 पूजा विधि और मंत्र</h4>
+          {aiResponse.vidhiDetails ? (
+            <div className="bg-white border border-gray-200 rounded-lg p-4 max-h-96 overflow-y-auto shadow-sm">
+              <div 
+                className="font-devanagari text-sm leading-relaxed ai-response-content"
+                dangerouslySetInnerHTML={{ 
+                  __html: formatAIResponse(aiResponse.vidhiDetails) 
+                }}
+              />
+            </div>
+          ) : (
+            <div className="bg-[#F5F5F5] p-4 rounded-lg">
+              <p className="font-devanagari text-gray-600">
+                विधि की जानकारी लोड हो रही है...
+              </p>
+            </div>
+          )}
           <button
             onClick={resetFlow}
             className="w-full bg-[#1B5E20] text-white px-4 py-3 rounded-lg hover:bg-[#2E7D32] font-semibold"
@@ -368,6 +427,7 @@ export function AiSankalpGenerator() {
 export function AiPanchangWidget() {
   const [data, setData] = useState('');
   const [loading, setLoading] = useState(false);
+  
   const refresh = async () => {
     setLoading(true); setData('');
 
@@ -439,15 +499,156 @@ export function AiPanchangWidget() {
     }
     finally { setLoading(false); }
   };
+
+  // Parse panchang data for better layout
+  const parsePanchangData = (rawData) => {
+    if (!rawData) return null;
+    
+    const lines = rawData.split('\n').filter(line => line.trim());
+    const sections = {
+      title: '',
+      basic: [],
+      timing: [],
+      muhurat: [],
+      festivals: [],
+      note: ''
+    };
+    
+    lines.forEach(line => {
+      const trimmed = line.trim();
+      if (!trimmed) return;
+      
+      if (trimmed.includes('आज का पंचांग')) {
+        sections.title = trimmed;
+      } else if (trimmed.includes('सूर्योदय') || trimmed.includes('सूर्यास्त')) {
+        sections.timing.push(trimmed);
+      } else if (trimmed.includes('शुभ समय') || trimmed.includes('वर्ज्य काल') || trimmed.includes('राहुकाल') || trimmed.includes('यमगण्ड') || trimmed.includes('अभिजीत') || trimmed.includes('विजय')) {
+        sections.muhurat.push(trimmed);
+      } else if (trimmed.includes('पूजा') || trimmed.includes('पर्व') || trimmed.includes('दशहरा') || trimmed.includes('विजय दशमी')) {
+        sections.festivals.push(trimmed);
+      } else if (trimmed.includes('AI-जनित') || trimmed.includes('सामान्यीकृत') || trimmed.includes('पंडित') || trimmed.startsWith('*')) {
+        sections.note = trimmed;
+      } else if (trimmed.includes('तिथि:') || trimmed.includes('नक्षत्र:') || trimmed.includes('योग:') || trimmed.includes('करण:')) {
+        sections.basic.push(trimmed);
+      }
+    });
+    
+    return sections;
+  };
+
+  const panchangSections = parsePanchangData(data);
+  
   useEffect(() => { refresh(); }, []);
+  
   return (
     <div className="p-6 rounded-2xl shadow-lg bg-white border border-gray-200">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-2xl font-bold text-[#1B5E20] font-serif">डेली पंचांग (AI)</h3>
-        <button onClick={refresh} className="bg-[#1B5E20] text-white px-3 py-1.5 rounded-lg hover:bg-[#2E7D32]">Refresh</button>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-2xl font-bold text-[#1B5E20] font-serif">
+          डेली पंचांग (AI)
+        </h3>
+        <button 
+          onClick={refresh} 
+          className="bg-[#1B5E20] text-white px-3 py-1.5 rounded-lg hover:bg-[#2E7D32] transition-colors"
+        >
+          Refresh
+        </button>
       </div>
-      {loading && <div className="text-sm text-gray-500">अपडेट कर रहा है…</div>}
-      {data && <pre className="whitespace-pre-wrap text-[#424242] font-devanagari leading-7">{data}</pre>}
+      
+      {loading && (
+        <div className="text-center py-8">
+          <div className="text-sm text-gray-500 font-devanagari">अपडेट कर रहा है…</div>
+        </div>
+      )}
+      
+      {data && panchangSections && (
+        <div className="space-y-4">
+          {/* Title Section */}
+          {panchangSections.title && (
+            <div className="text-center border-b border-gray-200 pb-3">
+              <h4 className="font-bold text-lg font-devanagari text-[#1B5E20]">{panchangSections.title}</h4>
+            </div>
+          )}
+          
+          {/* Basic Panchang Info */}
+          {panchangSections.basic.length > 0 && (
+            <div className="border border-gray-200 rounded-lg p-4">
+              <h5 className="font-bold text-[#1B5E20] mb-3 text-base">
+                पंचांग विवरण
+              </h5>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {panchangSections.basic.map((item, index) => (
+                  <div key={index} className="font-devanagari text-sm p-3 bg-gray-50 rounded border">
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {/* Timing Section */}
+          {panchangSections.timing.length > 0 && (
+            <div className="border border-gray-200 rounded-lg p-4">
+              <h5 className="font-bold text-[#1B5E20] mb-3 text-base">
+                सूर्य समय
+              </h5>
+              <div className="space-y-2">
+                {panchangSections.timing.map((item, index) => (
+                  <div key={index} className="font-devanagari text-sm p-3 bg-gray-50 rounded border">
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {/* Muhurat Section */}
+          {panchangSections.muhurat.length > 0 && (
+            <div className="border border-gray-200 rounded-lg p-4">
+              <h5 className="font-bold text-[#1B5E20] mb-3 text-base">
+                मुहूर्त और काल
+              </h5>
+              <div className="space-y-2">
+                {panchangSections.muhurat.map((item, index) => (
+                  <div key={index} className="font-devanagari text-sm p-3 bg-gray-50 rounded border">
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {/* Festivals Section */}
+          {panchangSections.festivals.length > 0 && (
+            <div className="border border-gray-200 rounded-lg p-4">
+              <h5 className="font-bold text-[#1B5E20] mb-3 text-base">
+                त्योहार और विशेष
+              </h5>
+              <div className="space-y-2">
+                {panchangSections.festivals.map((item, index) => (
+                  <div key={index} className="font-devanagari text-sm p-3 bg-gray-50 rounded border">
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {/* Note Section */}
+          {panchangSections.note && (
+            <div className="border border-gray-300 rounded-lg p-3 bg-gray-50">
+              <p className="font-devanagari text-xs text-gray-600 text-center italic">
+                {panchangSections.note.replace(/^\*/, '').replace(/\*$/, '')}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+      
+      {data && !panchangSections && (
+        <div className="border border-gray-200 rounded-lg p-4">
+          <pre className="whitespace-pre-wrap text-[#424242] font-devanagari leading-7 text-sm">{data}</pre>
+        </div>
+      )}
     </div>
   );
 }
@@ -460,6 +661,12 @@ export function FloatingPujaChatbot() {
   const [aiResponse, setAiResponse] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [bookingData, setBookingData] = useState({ 
+    name: '', 
+    date: '', 
+    location: '', 
+    type: 'online' 
+  });
 
   const ask = async () => {
     if (!userInput.trim()) return;
@@ -490,6 +697,84 @@ export function FloatingPujaChatbot() {
     setUserInput(''); 
     setAiResponse({}); 
     setError(''); 
+    setBookingData({ name: '', date: '', location: '', type: 'online' });
+  };
+
+  const handleInfoRequest = async () => {
+    setLoading(true);
+    setError('');
+    
+    try {
+      // Extract the puja name from the AI response for detailed vidhi
+      const pujaName = aiResponse.pujaSuggestion ? 
+        aiResponse.pujaSuggestion.split('\n')[0].replace(/[*:]/g, '').trim() : 
+        userInput;
+      
+      const vidhiPrompt = `भूमिका: आप एक अनुभवी वैदिक आचार्य हैं।
+पूजा: "${pujaName}"
+
+कृपया इस पूजा की संपूर्ण विधि बताएं:
+
+(a) पूजा विधि (Step by Step):
+- तैयारी और स्थान की शुद्धता
+- पूजा की शुरुआत कैसे करें
+- मंत्र और आरती
+- समापन विधि
+
+(b) मंत्र और श्लोक:
+- मुख्य मंत्र (संस्कृत में)
+- आरती के श्लोक
+- संकल्प मंत्र
+
+(c) समय और दिशा:
+- उत्तम समय (मुहूर्त)
+- दिशा का महत्व
+- कितनी देर तक करें
+
+(d) विशेष नियम:
+- क्या करें और क्या न करें
+- व्रत के नियम (यदि कोई हो)
+- फल प्राप्ति के लिए विशेष बातें
+
+संक्षिप्त और स्पष्ट भाषा में उत्तर दें।`;
+
+      const vidhiResponse = await generateText({ prompt: vidhiPrompt });
+      
+      setAiResponse({
+        ...aiResponse,
+        vidhiDetails: vidhiResponse || 'विधि की जानकारी प्राप्त नहीं हो सकी।'
+      });
+      
+      setStep('info');
+    } catch (e) {
+      const msg = (e?.message || '').includes('Missing GEMINI_API_KEY') ? 
+        t('ai.apiKeyError', language) : 
+        (e?.message || t('ai.generalError', language));
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBooking = () => {
+    // Validate booking data
+    if (!bookingData.name.trim()) {
+      setError('कृपया अपना नाम दर्ज करें');
+      return;
+    }
+    if (!bookingData.date) {
+      setError('कृपया तारीख चुनें');
+      return;
+    }
+    if (bookingData.type === 'offline' && !bookingData.location.trim()) {
+      setError('कृपया पूरा पता दर्ज करें');
+      return;
+    }
+
+    // Here you would integrate with payment system
+    // For now, just show success and reset
+    alert('बुकिंग सफल! हमारी टीम जल्द ही आपसे संपर्क करेगी।');
+    reset();
   };
 
   return (
@@ -499,6 +784,7 @@ export function FloatingPujaChatbot() {
       </button>
       {open && (
         <div className="fixed bottom-40 right-6 z-50 w-80 bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-hidden">
+          <style dangerouslySetInnerHTML={{ __html: aiResponseStyles }} />
           <div className="bg-[#1B5E20] text-white px-4 py-2 font-semibold">AI Puja Suggestion</div>
           <div className="p-3 space-y-3">
             {step === 'greeting' && (
@@ -515,21 +801,18 @@ export function FloatingPujaChatbot() {
 
             {step === 'action' && aiResponse.pujaSuggestion && (
               <div className="space-y-2 text-sm">
-                <div className="bg-[#F5F5F5] p-2 rounded">
-                  <div className="font-semibold text-[#1B5E20]">पूजा सुझाव</div>
-                  <div className="font-devanagari">{aiResponse.pujaSuggestion}</div>
-                </div>
-                <div className="bg-[#F5F5F5] p-2 rounded">
-                  <div className="font-semibold text-[#1B5E20]">संक्षिप्त कारण</div>
-                  <div className="font-devanagari">{aiResponse.reason}</div>
-                </div>
-                <div className="bg-[#F5F5F5] p-2 rounded">
-                  <div className="font-semibold text-[#1B5E20]">पूजा सामग्री</div>
-                  <div className="font-devanagari">{aiResponse.materials}</div>
+                <div className="bg-white border border-gray-200 rounded p-3 max-h-64 overflow-y-auto">
+                  <div className="font-semibold text-[#1B5E20] mb-3 text-sm border-b border-gray-200 pb-1">🙏 AI पूजा सुझाव</div>
+                  <div 
+                    className="font-devanagari text-xs leading-relaxed ai-response-content"
+                    dangerouslySetInnerHTML={{ 
+                      __html: formatAIResponse(aiResponse.pujaSuggestion) 
+                    }}
+                  />
                 </div>
                 <div className="flex gap-2">
                   <button onClick={() => setStep('booking')} className="flex-1 bg-[#FFB300] text-white px-3 py-2 rounded-lg hover:bg-[#FFC107] text-sm">📅 बुक करें</button>
-                  <button onClick={() => setStep('info')} className="flex-1 bg-[#1B5E20] text-white px-3 py-2 rounded-lg hover:bg-[#2E7D32] text-sm">📖 विधि</button>
+                  <button onClick={handleInfoRequest} className="flex-1 bg-[#1B5E20] text-white px-3 py-2 rounded-lg hover:bg-[#2E7D32] text-sm">📖 विधि</button>
                 </div>
               </div>
             )}
@@ -547,21 +830,29 @@ export function FloatingPujaChatbot() {
                   <input className="w-full border rounded-lg px-3 py-2" placeholder="पता" value={bookingData.location} onChange={e => setBookingData({ ...bookingData, location: e.target.value })} />
                 )}
                 <div className="flex gap-2">
-                  // TODO: Replace with proper UI notification
-                  <button onClick={reset} className="bg-gray-500 text-white px-3 py-2 rounded-lg hover:bg-gray-600">रद्द</button>
+                  <button onClick={handleBooking} className="flex-1 bg-[#FFB300] text-white px-3 py-2 rounded-lg hover:bg-[#FFC107] text-sm">बुकिंग पूरी करें</button>
+                  <button onClick={reset} className="bg-gray-500 text-white px-3 py-2 rounded-lg hover:bg-gray-600 text-sm">रद्द</button>
                 </div>
               </div>
             )}
 
             {step === 'info' && (
               <div className="space-y-2 text-sm">
-                <div className="font-semibold text-[#1B5E20]">पूजा विधि और मंत्र</div>
-                <div className="bg-[#F5F5F5] p-2 rounded font-devanagari">
-                  <div><b>विधि:</b> स्नान कर स्थान शुद्ध करें, दीपक जलाएँ, संकल्प लेकर पूजा शुरू करें।</div>
-                  <div><b>मंत्र:</b> "ॐ गणेशाय नमः"</div>
-                  <div><b>समय:</b> प्रातः/सायं 6-8</div>
-                  <div><b>दिन:</b> मंगलवार/गुरुवार शुभ</div>
-                </div>
+                <div className="font-semibold text-[#1B5E20]">📖 पूजा विधि और मंत्र</div>
+                {aiResponse.vidhiDetails ? (
+                  <div className="bg-white border border-gray-200 rounded p-2 max-h-48 overflow-y-auto">
+                    <div 
+                      className="font-devanagari text-xs leading-relaxed ai-response-content"
+                      dangerouslySetInnerHTML={{ 
+                        __html: formatAIResponse(aiResponse.vidhiDetails) 
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div className="bg-[#F5F5F5] p-2 rounded font-devanagari text-gray-600">
+                    विधि की जानकारी लोड हो रही है...
+                  </div>
+                )}
                 <button onClick={reset} className="w-full bg-[#1B5E20] text-white px-3 py-2 rounded-lg hover:bg-[#2E7D32]">नया प्रश्न</button>
               </div>
             )}

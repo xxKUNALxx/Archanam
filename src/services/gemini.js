@@ -3,7 +3,6 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Environment variable access
 const apiKey = import.meta.env.GEMINI_API_KEY;
-console.log('Gemini API Key loaded:', apiKey ? 'YES' : 'NO', apiKey?.substring(0, 10) + '...');
 let client;
 
 function getClient() {

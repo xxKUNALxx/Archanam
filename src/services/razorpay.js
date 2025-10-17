@@ -5,13 +5,6 @@ const CURRENCY = import.meta.env.CURRENCY;
 const MERCHANT_NAME = import.meta.env.MERCHANT_NAME;
 const UPI_ID = import.meta.env.UPI_ID;
 
-console.log('Razorpay env loaded:', {
-  key: RAZORPAY_KEY_ID ? 'YES' : 'NO',
-  currency: CURRENCY,
-  merchant: MERCHANT_NAME,
-  upi: UPI_ID
-});
-
 // Razorpay configuration
 const RAZORPAY_CONFIG = {
     key: RAZORPAY_KEY_ID,

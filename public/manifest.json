@@ -1,0 +1,30 @@
+{
+  "name": "अर्चनम् - Archnam",
+  "short_name": "अर्चनम्",
+  "description": "आध्यात्मिक सेवाएं, पूजा बुकिंग, AI मंत्र सहायक, और दैनिक पंचांग",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1B5E20",
+  "theme_color": "#FFB300",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/peacock-feather.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["lifestyle", "utilities"],
+  "lang": "hi"
+}

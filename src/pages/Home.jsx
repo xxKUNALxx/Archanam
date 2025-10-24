@@ -27,7 +27,7 @@ const shivaUrl = 'https://i.pinimg.com/736x/9e/8c/f2/9e8cf28e13396a028717cb3b488
 // Footer Component
 const Footer = () => {
     const { language } = useLanguage();
-    
+
     return (
         <footer className="bg-[#1B5E20] text-white relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-[#1B5E20]/90 to-[#2E7D32]/90 z-0"></div>
@@ -83,8 +83,8 @@ const Footer = () => {
                 </div>
                 <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
                     <div className="flex flex-col md:flex-row justify-center items-center space-y-2 md:space-y-0 md:space-x-6 mb-4">
-                        <a 
-                            href="/privacy-policy" 
+                        <a
+                            href="/privacy-policy"
                             onClick={(e) => {
                                 e.preventDefault();
                                 window.history.pushState({}, '', '/privacy-policy');
@@ -95,8 +95,8 @@ const Footer = () => {
                             {language === 'hi' ? 'गोपनीयता नीति' : 'Privacy Policy'}
                         </a>
                         <span className="hidden md:inline">|</span>
-                        <a 
-                            href="/terms" 
+                        <a
+                            href="/terms"
                             className="hover:text-[#FFB300] transition-colors cursor-pointer font-devanagari"
                         >
                             {language === 'hi' ? 'नियम और शर्तें' : 'Terms & Conditions'}
@@ -449,17 +449,17 @@ const Home = () => {
                                 <div className="space-y-4 sm:space-y-6">
                                     <div className="h-48 sm:h-56 md:h-64 rounded-xl overflow-hidden shadow-lg relative transform transition-transform duration-500 hover:scale-105">
                                         <img
-                                            src="https://i.pinimg.com/736x/d0/08/90/d008903c85b910a67047bdb2450ac013.jpg"
+                                            src="/img3.jpg"
                                             alt="Hindu Temple"
-                                            className="w-full h-full object-cover"
+                                            className="w-full h-full object-fit"
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-[#1B5E20]/40 to-transparent"></div>
                                     </div>
                                     <div className="h-40 sm:h-48 md:h-48 rounded-xl overflow-hidden shadow-lg relative transform transition-transform duration-500 hover:scale-105">
                                         <img
-                                            src="https://i.pinimg.com/1200x/a6/97/96/a69796b376475a57668cb0ac789d38d8.jpg"
+                                            src="/img2.jpg"
                                             alt="Lotus flower"
-                                            className="w-full h-full object-cover"
+                                            className="w-full h-full object-fit"
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-[#FFB300]/40 to-transparent"></div>
                                     </div>
@@ -467,17 +467,17 @@ const Home = () => {
                                 <div className="space-y-4 sm:space-y-6 sm:mt-0 mt-8">
                                     <div className="h-40 sm:h-48 md:h-48 rounded-xl overflow-hidden shadow-lg relative transform transition-transform duration-500 hover:scale-105">
                                         <img
-                                            src="https://i.pinimg.com/736x/8b/a3/22/8ba322b239ed9a845c7c83abaef61827.jpg"
+                                            src="/img1.jpg"
                                             alt="Prayer beads"
-                                            className="w-full h-full object-cover"
+                                            className="w-full h-full object-fit"
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-[#FFB300]/40 to-transparent"></div>
                                     </div>
                                     <div className="h-48 sm:h-56 md:h-64 rounded-xl overflow-hidden shadow-lg relative transform transition-transform duration-500 hover:scale-105">
                                         <img
-                                            src="https://i.pinimg.com/1200x/71/72/3a/71723a56db77c3e1e8d9c6168e50ed8c.jpg"
+                                            src="/img5.jpg"
                                             alt="Hindu ceremony"
-                                            className="w-full h-full object-cover"
+                                            className="w-full h-full object-fit"
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-[#1B5E20]/40 to-transparent"></div>
                                     </div>

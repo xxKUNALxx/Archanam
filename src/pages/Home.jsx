@@ -54,7 +54,7 @@ const Footer = () => {
                         <div className="space-y-2 text-gray-300">
                             <div className="flex items-center space-x-2">
                                 <Phone className="w-4 h-4 text-[#FFB300]" />
-                                <span>+91 96342 93307</span>
+                                <span>+91 9458090609</span>
                             </div>
                             <div className="flex items-center space-x-2">
                                 <Mail className="w-4 h-4 text-[#FFB300]" />
@@ -552,7 +552,7 @@ const Home = () => {
                             <div className="text-center p-6 bg-white/10 backdrop-blur-sm rounded-2xl transform transition-transform duration-300 hover:scale-105">
                                 <Phone className="w-12 h-12 mx-auto mb-4 text-[#FFB300]" />
                                 <h3 className="text-xl font-semibold mb-2 font-devanagari">{t('home.callUs', language)}</h3>
-                                <p className="opacity-90">+91 96342 93307</p>
+                                <p className="opacity-90">+91 9458090609</p>
                             </div>
                             <div className="text-center p-6 bg-white/10 backdrop-blur-sm rounded-2xl transform transition-transform duration-300 hover:scale-105">
                                 <Mail className="w-12 h-12 mx-auto mb-4 text-[#FFB300]" />

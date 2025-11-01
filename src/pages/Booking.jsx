@@ -408,7 +408,7 @@ const Booking = () => {
                                     <div className="space-y-4">
                                         <div className="flex items-center space-x-3">
                                             <Phone className="w-5 h-5 text-[#FFB300]" />
-                                            <span>+919458090609‬</span>
+                                            <span>+91 9458090609</span>
                                         </div>
                                         <div className="flex items-center space-x-3">
                                             <Mail className="w-5 h-5 text-[#FFB300]" />

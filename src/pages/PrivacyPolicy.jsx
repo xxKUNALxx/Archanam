@@ -255,7 +255,7 @@ const PrivacyPolicy = () => {
                                     </div>
                                     <div className="flex items-center">
                                         <Phone className="w-5 h-5 text-[#FFB300] mr-3" />
-                                        <span className="font-devanagari">+91 96342 93307</span>
+                                        <span className="font-devanagari">+91 9458090609</span>
                                     </div>
                                     <div className="flex items-center">
                                         <MapPin className="w-5 h-5 text-[#FFB300] mr-3" />

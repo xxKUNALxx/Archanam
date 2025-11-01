@@ -5,7 +5,7 @@ import { t } from '../utils/translations';
 import Navbar from '../components/Navbar';
 import { createBooking, updateBooking } from '../services/bookingStore';
 import { loadRazorpayScript, createRazorpayOrder, initializeRazorpayPayment, BOOKING_STATUS } from '../services/razorpay';
-import { sendWhatsAppMessage, sendCustomerConfirmation } from '../services/whatsapp';
+import { sendTelegramMessage } from '../services/telegram';
 
 const Booking = () => {
     const { language } = useLanguage();
@@ -228,35 +228,23 @@ const Booking = () => {
                             paidAt: new Date().toISOString()
                         });
                         
-                        // Send WhatsApp notification to admin
+                        // Send Telegram notification to admin
                         try {
- const whatsappResult = await sendWhatsAppMessage({
+ const telegramResult = await sendTelegramMessage({
                                 ...formData,
                                 bookingId: updatedBooking.bookingId,
                                 paymentId: paymentResponse.paymentId,
                                 amount: paymentResponse.amount
                             });
                             
-                            if (whatsappResult.success) {
+                            if (telegramResult.success) {
                             } else {
                             }
                             
-                            // Optional: Send confirmation to customer
-                            const customerConfirmation = await sendCustomerConfirmation(
-                                formData.phone, 
-                                {
-                                    ...formData,
-                                    bookingId: updatedBooking.bookingId,
-                                    amount: paymentResponse.amount
-                                }
-                            );
+                            // Customer confirmation removed - Telegram bot can only send to registered user
                             
-                            if (customerConfirmation.success) {
-                            } else {
-                            }
-                            
-                        } catch (whatsappError) {
-                            // Don't fail the booking if WhatsApp fails
+                        } catch (telegramError) {
+                            // Don't fail the booking if Telegram fails
                         }
                         
                         setLoading(false);
@@ -285,35 +273,23 @@ const Booking = () => {
                             paidAt: new Date().toISOString()
                         });
                         
-                        // Send WhatsApp notification to admin
+                        // Send Telegram notification to admin
                         try {
- const whatsappResult = await sendWhatsAppMessage({
+ const telegramResult = await sendTelegramMessage({
                                 ...formData,
                                 bookingId: updatedBooking.bookingId,
                                 paymentId: paymentResponse.paymentId,
                                 amount: paymentResponse.amount
                             });
                             
-                            if (whatsappResult.success) {
+                            if (telegramResult.success) {
                             } else {
                             }
                             
-                            // Optional: Send confirmation to customer
-                            const customerConfirmation = await sendCustomerConfirmation(
-                                formData.phone, 
-                                {
-                                    ...formData,
-                                    bookingId: updatedBooking.bookingId,
-                                    amount: paymentResponse.amount
-                                }
-                            );
+                            // Customer confirmation removed - Telegram bot can only send to registered user
                             
-                            if (customerConfirmation.success) {
-                            } else {
-                            }
-                            
-                        } catch (whatsappError) {
-                            // Don't fail the booking if WhatsApp fails
+                        } catch (telegramError) {
+                            // Don't fail the booking if Telegram fails
                         }
                         
                         setLoading(false);
@@ -339,7 +315,7 @@ const Booking = () => {
 
     const selectedService = services.find(s => s.value === formData.serviceType);
 
-    // WhatsApp test function removed for production
+    // Telegram test function removed for production
 
     // Load Razorpay script on component mount
     useEffect(() => {
@@ -956,3 +932,4 @@ const Booking = () => {
 };
 
 export default Booking;
+

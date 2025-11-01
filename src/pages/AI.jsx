@@ -59,10 +59,11 @@ export function AiPujaSuggestion() {
   };
 
   const handleBooking = () => {
-    // Here you would integrate with payment system
-    setStep('greeting');
-    setUserInput('');
-    setAiResponse({});
+    // Navigate to booking page
+    if (typeof window !== 'undefined') {
+      window.history.pushState({}, '', '/booking');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    }
   };
 
   const handleInfoRequest = async () => {
@@ -175,7 +176,7 @@ export function AiPujaSuggestion() {
 
           <div className="flex gap-3 mt-6">
             <button
-              onClick={handleBooking}
+              onClick={() => setStep('booking')}
               className="flex-1 bg-[#FFB300] text-white px-4 py-3 rounded-lg hover:bg-[#FFC107] font-semibold"
             >
               📅 पूजा बुक करें
@@ -531,24 +532,11 @@ export function FloatingPujaChatbot() {
   };
 
   const handleBooking = () => {
-    // Validate booking data
-    if (!bookingData.name.trim()) {
-      setError('कृपया अपना नाम दर्ज करें');
-      return;
+    // Navigate to booking page
+    if (typeof window !== 'undefined') {
+      window.history.pushState({}, '', '/booking');
+      window.dispatchEvent(new PopStateEvent('popstate'));
     }
-    if (!bookingData.date) {
-      setError('कृपया तारीख चुनें');
-      return;
-    }
-    if (bookingData.type === 'offline' && !bookingData.location.trim()) {
-      setError('कृपया पूरा पता दर्ज करें');
-      return;
-    }
-
-    // Here you would integrate with payment system
-    // For now, just show success and reset
-    alert('बुकिंग सफल! हमारी टीम जल्द ही आपसे संपर्क करेगी।');
-    reset();
   };
 
   return (

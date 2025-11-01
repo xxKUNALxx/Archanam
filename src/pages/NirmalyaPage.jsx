@@ -14,6 +14,13 @@ const NirmalyaPage = () => {
     const bookingRef = useRef(null);
     const packagesRef = useRef(null);
 
+    const goToBooking = () => {
+        if (typeof window !== 'undefined') {
+            window.history.pushState({}, '', '/booking');
+            window.dispatchEvent(new PopStateEvent('popstate'));
+        }
+    };
+
     useEffect(() => {
         if (typeof window !== 'undefined' && window.gsap && window.ScrollTrigger) {
             window.gsap.registerPlugin(window.ScrollTrigger);
@@ -105,9 +112,9 @@ const NirmalyaPage = () => {
                     <p className="text-lg md:text-xl mt-4 max-w-2xl mx-auto font-sanskrit italic">
                         "गंगे च यमुने चैव गोदावरि सरस्वति। नर्मदे सिन्धु कावेरि जलेऽस्मिन् सन्तिष्ठ मे॥"
                     </p>
-                    <a href="#book-nirmalya" className="mt-8 inline-block bg-gradient-to-r from-[#FFB300] to-[#FFC107] text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-[#FFC107] hover:to-[#FFD54F] transform hover:scale-105 transition-all duration-300 shadow-xl font-devanagari">
+                    <button onClick={goToBooking} className="mt-8 inline-block bg-gradient-to-r from-[#FFB300] to-[#FFC107] text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-[#FFC107] hover:to-[#FFD54F] transform hover:scale-105 transition-all duration-300 shadow-xl font-devanagari">
 {t('home.bookNow', language)}
-                    </a>
+                    </button>
                 </div>
             </header>
             

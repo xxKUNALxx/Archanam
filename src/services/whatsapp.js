@@ -5,7 +5,7 @@ const WHATSAPP_CONFIG = {
     // Your WhatsApp Business API credentials from Meta Developer
     phoneNumberId: import.meta.env.VITE_WHATSAPP_PHONE_NUMBER_ID,
     accessToken: import.meta.env.VITE_WHATSAPP_ACCESS_TOKEN,
-    apiVersion: 'v18.0',
+    apiVersion: 'v22.0',
     recipientNumber: import.meta.env.VITE_WHATSAPP_RECIPIENT_NUMBER, // Your WhatsApp number to receive messages
 };
 
@@ -88,6 +88,7 @@ const formatBookingMessage = (bookingData) => {
 export const sendWhatsAppMessage = async (bookingData) => {
     try {
 
+
         // Check if WhatsApp is configured
         if (!WHATSAPP_CONFIG.phoneNumberId || !WHATSAPP_CONFIG.accessToken || !WHATSAPP_CONFIG.recipientNumber) {
             return { success: false, error: 'WhatsApp not configured' };
@@ -95,31 +96,71 @@ export const sendWhatsAppMessage = async (bookingData) => {
 
         const message = formatBookingMessage(bookingData);
         
-        // Use custom booking confirmation template
+        const { name, phone, email, serviceType, date, time, address, amount, bookingId, paymentId } = bookingData;
+        
+        // Get service name
+        const services = {
+            'daily-flower-mala-monthly': 'डेली फूल माला (मंथली)',
+            'nirmalya-monthly': 'निर्माल्य सेवा (मंथली)',
+            'nirmalya-4months': 'निर्माल्य 4 महीने',
+            'astrology-kundali': 'ज्योतिष कुंडली विश्लेषण'
+        };
+        const serviceName = services[serviceType] || serviceType;
+
+        // Use approved template with correct parameter order
         const payload = {
             messaging_product: "whatsapp",
-            to: WHATSAPP_CONFIG.recipientNumber,
+            to: WHATSAPP_CONFIG.recipientNumber.replace('+', ''),
             type: "template",
             template: {
                 name: "booking_confirmation",
                 language: {
-                    code: "en" // English language code as per your template
+                    code: "en"
                 },
                 components: [
                     {
                         type: "body",
                         parameters: [
-                            { type: "text", text: bookingData.name || 'ग्राहक' },                    // {{1}} - Name
-                            { type: "text", text: bookingData.bookingId || 'N/A' },                // {{2}} - Booking ID
-                            { type: "text", text: bookingData.phone || 'N/A' },                    // {{3}} - Phone
-                            { type: "text", text: bookingData.email || 'N/A' },                    // {{4}} - Email
-                            { type: "text", text: bookingData.serviceType || 'सेवा' },             // {{5}} - Service
-                            { type: "text", text: bookingData.date || 'N/A' },                     // {{6}} - Date
-                            { type: "text", text: bookingData.time || 'N/A' },                     // {{7}} - Time
-                            { type: "text", text: bookingData.address || 'N/A' },                  // {{8}} - Address
-                            { type: "text", text: bookingData.amount?.toString() || '0' },         // {{9}} - Amount
-                            { type: "text", text: bookingData.paymentId || 'N/A' },               // {{10}} - Payment ID
-                            { type: "text", text: bookingData.specialRequests || 'कोई विशेष अनुरोध नहीं' } // {{11}} - Special requests
+                            {
+                                type: "text",
+                                text: name || "Test User"
+                            },
+                            {
+                                type: "text",
+                                text: bookingId || "TEST123"
+                            },
+                            {
+                                type: "text",
+                                text: phone || "1234567890"
+                            },
+                            {
+                                type: "text",
+                                text: email || "test@gmail.com"
+                            },
+                            {
+                                type: "text", 
+                                text: serviceName || "mala"
+                            },
+                            {
+                                type: "text",
+                                text: date || "14-10-25"
+                            },
+                            {
+                                type: "text",
+                                text: time || "6:50 AM"
+                            },
+                            {
+                                type: "text",
+                                text: address || "address"
+                            },
+                            {
+                                type: "text",
+                                text: amount || "1900"
+                            },
+                            {
+                                type: "text",
+                                text: paymentId || "12312"
+                            }
                         ]
                     }
                 ]
@@ -148,13 +189,39 @@ export const sendWhatsAppMessage = async (bookingData) => {
     }
 };
 
+// Format phone number for WhatsApp API
+const formatPhoneNumber = (phone) => {
+    // Remove all non-digit characters
+    let cleanPhone = phone.replace(/\D/g, '');
+    
+    // If it starts with 91, it's already in international format
+    if (cleanPhone.startsWith('91')) {
+        return '+' + cleanPhone;
+    }
+    
+    // If it's 10 digits, add India country code
+    if (cleanPhone.length === 10) {
+        return '+91' + cleanPhone;
+    }
+    
+    // If it already has +, return as is
+    if (phone.startsWith('+')) {
+        return phone;
+    }
+    
+    // Default: assume it needs +91
+    return '+91' + cleanPhone;
+};
+
 // Send confirmation message to customer (optional)
 export const sendCustomerConfirmation = async (customerPhone, bookingData) => {
     try {
-
         if (!WHATSAPP_CONFIG.phoneNumberId || !WHATSAPP_CONFIG.accessToken) {
             return { success: false, error: 'WhatsApp not configured' };
         }
+
+        // Format phone number properly
+        const formattedPhone = formatPhoneNumber(customerPhone);
 
         const services = {
             'daily-flower-mala-monthly': 'डेली फूल माला (मंथली)',
@@ -180,7 +247,7 @@ export const sendCustomerConfirmation = async (customerPhone, bookingData) => {
 
         const payload = {
             messaging_product: "whatsapp",
-            to: customerPhone,
+            to: formattedPhone,
             type: "text",
             text: {
                 body: message
@@ -209,4 +276,45 @@ export const sendCustomerConfirmation = async (customerPhone, bookingData) => {
     }
 };
 
-// WhatsApp test functions removed for production
+// Test WhatsApp configuration and API
+export const testWhatsAppConnection = async () => {
+    try {
+        // Check configuration
+        if (!WHATSAPP_CONFIG.phoneNumberId || !WHATSAPP_CONFIG.accessToken || !WHATSAPP_CONFIG.recipientNumber) {
+            return { success: false, error: 'WhatsApp configuration missing' };
+        }
+        
+        // Test with hello_world template first (like your working curl)
+        const testPayload = {
+            messaging_product: "whatsapp",
+            to: WHATSAPP_CONFIG.recipientNumber.replace('+', ''),
+            type: "template",
+            template: {
+                name: "hello_world",
+                language: {
+                    code: "en_US"
+                }
+            }
+        };
+        
+        const response = await fetch(getWhatsAppApiUrl(), {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${WHATSAPP_CONFIG.accessToken}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(testPayload)
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            return { success: true, messageId: result.messages?.[0]?.id, response: result };
+        } else {
+            return { success: false, error: result.error?.message || 'Test failed', response: result };
+        }
+        
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+};

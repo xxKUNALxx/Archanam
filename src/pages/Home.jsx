@@ -8,6 +8,7 @@ import AIPage, { FloatingPujaChatbot } from './AI';
 import AstrologyPage from './AstrologyPage';
 import { useLanguage } from '../context/LanguageContext';
 import { t, translations } from '../utils/translations';
+import { PanchangWidget } from '../components/PanchangWidget';
 
 // Main Home page image URLs
 const homeBgUrl = '/mandir.png';

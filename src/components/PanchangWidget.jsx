@@ -5,20 +5,26 @@ export function PanchangWidget() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   
-  const refresh = async () => {
+  const refresh = async (forceRefresh = false) => {
     setLoading(true); 
     setError('');
     setPanchangData(null);
 
     try {
       // Import the panchang service
-      const { getPanchangData } = await import('../services/panchang.js');
+      const { getTithiData } = await import('../services/panchang.js');
       
-      // Get today's panchang data
+      // Get today's tithi data with force refresh option
       const today = new Date();
-      const data = await getPanchangData(today);
+      const data = await getTithiData(today, forceRefresh);
       
-      setPanchangData(data);
+      if (data.error) {
+        setError(data.message.includes('rate limit') ? 
+          'API दर सीमा पार हो गई। कृपया कुछ मिनट बाद पुनः प्रयास करें।' : 
+          data.message);
+      } else {
+        setPanchangData(data);
+      }
     } catch (e) {
       console.error('Error fetching panchang:', e);
       setError('पंचांग डेटा लोड करने में समस्या हुई। कृपया पुनः प्रयास करें।');
@@ -27,40 +33,16 @@ export function PanchangWidget() {
     }
   };
 
-  // Format structured panchang data for display
+  // Format tithi data for display
   const formatPanchangForDisplay = (data) => {
-    if (!data) return null;
+    if (!data || !data.success) return null;
     
     return {
-      title: `आज का पंचांग (${data.date})`,
-      basic: [
-        `तिथि: ${data.tithi}`,
-        `नक्षत्र: ${data.nakshatra}`,
-        `योग: ${data.yoga}`,
-        `करण: ${data.karana}`,
-        `पक्ष: ${data.paksha}`,
-        `वार: ${data.weekday}`
-      ].filter(item => !item.includes('undefined')),
-      timing: [
-        `सूर्योदय: ${data.sunrise}`,
-        `सूर्यास्त: ${data.sunset}`
-      ].filter(item => !item.includes('undefined')),
-      muhurat: data.muhurat ? [
-        data.muhurat.abhijit && `अभिजीत मुहूर्त: ${data.muhurat.abhijit}`,
-        data.muhurat.vijaya && `विजय मुहूर्त: ${data.muhurat.vijaya}`,
-        data.muhurat.rahukaal && `राहुकाल: ${data.muhurat.rahukaal}`,
-        data.muhurat.yamaganda && `यमगण्ड काल: ${data.muhurat.yamaganda}`
-      ].filter(Boolean) : [],
-      additional: [
-        data.moonsign && `चंद्र राशि: ${data.moonsign}`,
-        data.sunsign && `सूर्य राशि: ${data.sunsign}`,
-        data.month?.amanta && `अमांत मास: ${data.month.amanta}`,
-        data.month?.purnimanta && `पूर्णिमांत मास: ${data.month.purnimanta}`,
-        data.samvat?.vikram && `विक्रम संवत: ${data.samvat.vikram}`,
-        data.samvat?.shaka && `शक संवत: ${data.samvat.shaka}`
-      ].filter(Boolean),
-      festivals: data.festivals || [],
-      note: data.note || 'सटीक पंचांग डेटा। स्थानीय समयानुसार थोड़ा अंतर हो सकता है।'
+      title: `आज का पंचांग (${new Date().toLocaleDateString('hi-IN')})`,
+      output: data.output,
+      source: data.source || 'panchang.click',
+      scraped_at: data.scraped_at,
+      note: 'panchang.click से प्राप्त पंचांग डेटा।'
     };
   };
 
@@ -75,7 +57,7 @@ export function PanchangWidget() {
           डेली पंचांग
         </h3>
         <button 
-          onClick={refresh} 
+          onClick={() => refresh(true)} 
           className="bg-[#1B5E20] text-white px-3 py-1.5 rounded-lg hover:bg-[#2E7D32] transition-colors"
         >
           Refresh
@@ -95,90 +77,128 @@ export function PanchangWidget() {
             <h4 className="font-bold text-lg font-devanagari text-[#1B5E20]">{displayData.title}</h4>
           </div>
           
-          {/* Basic Panchang Info */}
+          {/* Formatted Tithi Display */}
           <div className="border border-gray-200 rounded-lg p-4">
             <h5 className="font-bold text-[#1B5E20] mb-3 text-base">
-              पंचांग विवरण
+              तिथि विवरण
             </h5>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {displayData.basic.map((item, index) => (
-                <div key={index} className="font-devanagari text-sm p-3 bg-gray-50 rounded border">
-                  {item}
+            <div className="space-y-3">
+              {/* Structured Panchang Content */}
+              {typeof displayData.output === 'object' && !displayData.output.error ? (
+                <div className="space-y-4">
+                  {/* Date and Time Info */}
+                  {(displayData.output.date || displayData.output.time) && (
+                    <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+                      <div className="font-bold text-[#1B5E20] mb-2">दिनांक और समय</div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                        {displayData.output.date && (
+                          <div><span className="font-semibold">दिनांक:</span> {displayData.output.date}</div>
+                        )}
+                        {displayData.output.time && (
+                          <div><span className="font-semibold">समय:</span> {displayData.output.time}</div>
+                        )}
+                        {displayData.output.timezone && (
+                          <div><span className="font-semibold">टाइमज़ोन:</span> {displayData.output.timezone}</div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Main Panchang Elements */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {displayData.output.tithi && (
+                      <div className="bg-gray-50 rounded-lg p-4 border">
+                        <div className="font-bold text-[#1B5E20] mb-2">तिथि</div>
+                        <div className="font-devanagari text-sm">{displayData.output.tithi}</div>
+                      </div>
+                    )}
+                    {displayData.output.nakshatra && (
+                      <div className="bg-gray-50 rounded-lg p-4 border">
+                        <div className="font-bold text-[#1B5E20] mb-2">नक्षत्र</div>
+                        <div className="font-devanagari text-sm">{displayData.output.nakshatra}</div>
+                      </div>
+                    )}
+                    {displayData.output.yoga && (
+                      <div className="bg-gray-50 rounded-lg p-4 border">
+                        <div className="font-bold text-[#1B5E20] mb-2">योग</div>
+                        <div className="font-devanagari text-sm">{displayData.output.yoga}</div>
+                      </div>
+                    )}
+                    {displayData.output.karana && (
+                      <div className="bg-gray-50 rounded-lg p-4 border">
+                        <div className="font-bold text-[#1B5E20] mb-2">करण</div>
+                        <div className="font-devanagari text-sm">{displayData.output.karana}</div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Additional Info */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {displayData.output.maasa && (
+                      <div className="bg-gray-50 rounded-lg p-4 border">
+                        <div className="font-bold text-[#1B5E20] mb-2">मास</div>
+                        <div className="font-devanagari text-sm">{displayData.output.maasa}</div>
+                      </div>
+                    )}
+                    {displayData.output.vaar && (
+                      <div className="bg-gray-50 rounded-lg p-4 border">
+                        <div className="font-bold text-[#1B5E20] mb-2">वार</div>
+                        <div className="font-devanagari text-sm">{displayData.output.vaar}</div>
+                      </div>
+                    )}
+                    {displayData.output.rashi && (
+                      <div className="bg-gray-50 rounded-lg p-4 border">
+                        <div className="font-bold text-[#1B5E20] mb-2">राशि</div>
+                        <div className="font-devanagari text-sm">{displayData.output.rashi}</div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Sun and Moon Times */}
+                  {(displayData.output.sunrise || displayData.output.sunset || displayData.output.rahukaal) && (
+                    <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+                      <div className="font-bold text-[#1B5E20] mb-3">सूर्य और चंद्र समय</div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                        {displayData.output.sunrise && (
+                          <div><span className="font-semibold">सूर्योदय:</span> {displayData.output.sunrise}</div>
+                        )}
+                        {displayData.output.sunset && (
+                          <div><span className="font-semibold">सूर्यास्त:</span> {displayData.output.sunset}</div>
+                        )}
+                        {displayData.output.rahukaal && (
+                          <div><span className="font-semibold">राहुकाल:</span> {displayData.output.rahukaal}</div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Planetary Positions */}
+                  {(displayData.output.sun || displayData.output.moon) && (
+                    <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
+                      <div className="font-bold text-[#1B5E20] mb-3">ग्रह स्थिति</div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                        {displayData.output.sun && (
+                          <div><span className="font-semibold">सूर्य:</span> {displayData.output.sun}</div>
+                        )}
+                        {displayData.output.moon && (
+                          <div><span className="font-semibold">चंद्र:</span> {displayData.output.moon}</div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              ))}
+              ) : (
+                <div className="bg-gray-50 rounded-lg p-4 border">
+                  <div className="font-bold text-[#1B5E20] mb-3">आज का पंचांग विवरण</div>
+                  <div className="font-devanagari text-sm leading-relaxed whitespace-pre-wrap text-gray-800">
+                    {typeof displayData.output === 'string' ? displayData.output : JSON.stringify(displayData.output, null, 2)}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
           
-          {/* Timing Section */}
-          {displayData.timing.length > 0 && (
-            <div className="border border-gray-200 rounded-lg p-4">
-              <h5 className="font-bold text-[#1B5E20] mb-3 text-base">
-                सूर्य समय
-              </h5>
-              <div className="space-y-2">
-                {displayData.timing.map((item, index) => (
-                  <div key={index} className="font-devanagari text-sm p-3 bg-gray-50 rounded border">
-                    {item}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          {/* Muhurat Section */}
-          {displayData.muhurat.length > 0 && (
-            <div className="border border-gray-200 rounded-lg p-4">
-              <h5 className="font-bold text-[#1B5E20] mb-3 text-base">
-                मुहूर्त और काल
-              </h5>
-              <div className="space-y-2">
-                {displayData.muhurat.map((item, index) => (
-                  <div key={index} className="font-devanagari text-sm p-3 bg-gray-50 rounded border">
-                    {item}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          {/* Additional Info Section */}
-          {displayData.additional.length > 0 && (
-            <div className="border border-gray-200 rounded-lg p-4">
-              <h5 className="font-bold text-[#1B5E20] mb-3 text-base">
-                अतिरिक्त जानकारी
-              </h5>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {displayData.additional.map((item, index) => (
-                  <div key={index} className="font-devanagari text-sm p-3 bg-gray-50 rounded border">
-                    {item}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          {/* Festivals Section */}
-          {displayData.festivals.length > 0 && (
-            <div className="border border-gray-200 rounded-lg p-4">
-              <h5 className="font-bold text-[#1B5E20] mb-3 text-base">
-                त्योहार और विशेष
-              </h5>
-              <div className="space-y-2">
-                {displayData.festivals.map((item, index) => (
-                  <div key={index} className="font-devanagari text-sm p-3 bg-gray-50 rounded border">
-                    {item}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          {/* Note Section */}
-          <div className="border border-gray-300 rounded-lg p-3 bg-gray-50">
-            <p className="font-devanagari text-xs text-gray-600 text-center italic">
-              {displayData.note}
-            </p>
-          </div>
+
         </div>
       )}
       

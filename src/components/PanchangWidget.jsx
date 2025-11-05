@@ -4,23 +4,23 @@ export function PanchangWidget() {
   const [panchangData, setPanchangData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
+
   const refresh = async (forceRefresh = false) => {
-    setLoading(true); 
+    setLoading(true);
     setError('');
     setPanchangData(null);
 
     try {
       // Import the panchang service
       const { getTithiData } = await import('../services/panchang.js');
-      
+
       // Get today's tithi data with force refresh option
       const today = new Date();
       const data = await getTithiData(today, forceRefresh);
-      
+
       if (data.error) {
-        setError(data.message.includes('rate limit') ? 
-          'API दर सीमा पार हो गई। कृपया कुछ मिनट बाद पुनः प्रयास करें।' : 
+        setError(data.message.includes('rate limit') ?
+          'API दर सीमा पार हो गई। कृपया कुछ मिनट बाद पुनः प्रयास करें।' :
           data.message);
       } else {
         setPanchangData(data);
@@ -28,15 +28,15 @@ export function PanchangWidget() {
     } catch (e) {
       console.error('Error fetching panchang:', e);
       setError('पंचांग डेटा लोड करने में समस्या हुई। कृपया पुनः प्रयास करें।');
-    } finally { 
-      setLoading(false); 
+    } finally {
+      setLoading(false);
     }
   };
 
   // Format tithi data for display
   const formatPanchangForDisplay = (data) => {
     if (!data || !data.success) return null;
-    
+
     return {
       title: `आज का पंचांग (${new Date().toLocaleDateString('hi-IN')})`,
       output: data.output,
@@ -47,36 +47,36 @@ export function PanchangWidget() {
   };
 
   const displayData = formatPanchangForDisplay(panchangData);
-  
+
   useEffect(() => { refresh(); }, []);
-  
+
   return (
     <div className="p-6 rounded-2xl shadow-lg bg-white border border-gray-200">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-2xl font-bold text-[#1B5E20] font-serif">
           डेली पंचांग
         </h3>
-        <button 
-          onClick={() => refresh(true)} 
+        <button
+          onClick={() => refresh(true)}
           className="bg-[#1B5E20] text-white px-3 py-1.5 rounded-lg hover:bg-[#2E7D32] transition-colors"
         >
           Refresh
         </button>
       </div>
-      
+
       {loading && (
         <div className="text-center py-8">
           <div className="text-sm text-gray-500 font-devanagari">अपडेट कर रहा है…</div>
         </div>
       )}
-      
+
       {panchangData && displayData && (
         <div className="space-y-4">
           {/* Title Section */}
           <div className="text-center border-b border-gray-200 pb-3">
             <h4 className="font-bold text-lg font-devanagari text-[#1B5E20]">{displayData.title}</h4>
           </div>
-          
+
           {/* Formatted Tithi Display */}
           <div className="border border-gray-200 rounded-lg p-4">
             <h5 className="font-bold text-[#1B5E20] mb-3 text-base">
@@ -103,7 +103,7 @@ export function PanchangWidget() {
                       </div>
                     </div>
                   )}
-                  
+
                   {/* Main Panchang Elements */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {displayData.output.tithi && (
@@ -131,7 +131,7 @@ export function PanchangWidget() {
                       </div>
                     )}
                   </div>
-                  
+
                   {/* Additional Info */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {displayData.output.maasa && (
@@ -153,7 +153,7 @@ export function PanchangWidget() {
                       </div>
                     )}
                   </div>
-                  
+
                   {/* Sun and Moon Times */}
                   {(displayData.output.sunrise || displayData.output.sunset || displayData.output.rahukaal) && (
                     <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
@@ -171,21 +171,8 @@ export function PanchangWidget() {
                       </div>
                     </div>
                   )}
-                  
-                  {/* Planetary Positions */}
-                  {(displayData.output.sun || displayData.output.moon) && (
-                    <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
-                      <div className="font-bold text-[#1B5E20] mb-3">ग्रह स्थिति</div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                        {displayData.output.sun && (
-                          <div><span className="font-semibold">सूर्य:</span> {displayData.output.sun}</div>
-                        )}
-                        {displayData.output.moon && (
-                          <div><span className="font-semibold">चंद्र:</span> {displayData.output.moon}</div>
-                        )}
-                      </div>
-                    </div>
-                  )}
+
+
                 </div>
               ) : (
                 <div className="bg-gray-50 rounded-lg p-4 border">
@@ -197,11 +184,9 @@ export function PanchangWidget() {
               )}
             </div>
           </div>
-          
-
         </div>
       )}
-      
+
       {error && (
         <div className="border border-red-200 rounded-lg p-4 bg-red-50">
           <p className="font-devanagari text-sm text-red-600 text-center">
